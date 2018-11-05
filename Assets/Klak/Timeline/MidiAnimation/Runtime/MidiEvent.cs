@@ -1,6 +1,4 @@
-using UnityEngine;
-
-namespace Klak.Midi
+namespace Klak.Timeline
 {
     [System.Serializable]
     public struct MidiEvent
@@ -15,17 +13,5 @@ namespace Klak.Midi
             return string.Format
                 ("[{0}: {1:X}, {2}, {3}]", time, status, data1, data2);
         }
-    }
-
-    [System.Serializable]
-    public sealed class MidiTrack
-    {
-        public MidiEvent [] events;
-    }
-
-    public sealed class MidiAsset : ScriptableObject
-    {
-        public uint ticksPerQuarterNote;
-        public MidiTrack [] tracks;
     }
 }

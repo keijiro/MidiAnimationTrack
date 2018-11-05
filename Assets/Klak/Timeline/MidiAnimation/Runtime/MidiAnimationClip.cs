@@ -5,7 +5,7 @@ using UnityEngine.Timeline;
 namespace Klak.Timeline
 {
     [System.Serializable]
-    public class MidiAnimation : PlayableAsset, ITimelineClipAsset
+    public class MidiAnimationClip : PlayableAsset, ITimelineClipAsset
     {
         #region Serialized variables
 

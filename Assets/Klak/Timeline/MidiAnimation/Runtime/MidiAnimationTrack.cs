@@ -5,7 +5,7 @@ using UnityEngine.Timeline;
 namespace Klak.Timeline
 {
     [TrackColor(0.4f, 0.4f, 0.4f)]
-    [TrackClipType(typeof(MidiAnimation))]
+    [TrackClipType(typeof(MidiAnimationClip))]
     [TrackBindingType(typeof(GameObject))]
     public class MidiAnimationTrack : TrackAsset
     {

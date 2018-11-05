@@ -1,4 +1,4 @@
-namespace Klak.Midi
+namespace Klak.Timeline
 {
     // MIDI binary data stream reader
     sealed class MidiDataReader

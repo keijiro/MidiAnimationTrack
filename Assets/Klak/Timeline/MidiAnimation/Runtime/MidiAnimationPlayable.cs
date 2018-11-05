@@ -1,6 +1,5 @@
 using UnityEngine;
 using UnityEngine.Playables;
-using Klak.Midi;
 
 namespace Klak.Timeline
 {
@@ -9,7 +8,7 @@ namespace Klak.Timeline
     {
         #region Serialized variables
 
-        public MidiAsset sequence;
+        public MidiEvent [] events;
 
         #endregion
 

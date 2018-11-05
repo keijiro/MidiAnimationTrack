@@ -4,21 +4,21 @@ using UnityEngine.Playables;
 
 namespace Klak.Timeline
 {
-    [CustomEditor(typeof(MidiAnimation)), CanEditMultipleObjects]
-    class MidiAnimationEditor : Editor
+    [CustomEditor(typeof(MidiAnimationClip)), CanEditMultipleObjects]
+    class MidiAnimationClipEditor : Editor
     {
-        SerializedProperty _sequence;
+        SerializedProperty _events;
 
         void OnEnable()
         {
-            _sequence = serializedObject.FindProperty("template.sequence");
+            _events = serializedObject.FindProperty("template.events");
         }
 
         public override void OnInspectorGUI()
         {
             serializedObject.Update();
 
-            EditorGUILayout.PropertyField(_sequence);
+            EditorGUILayout.PropertyField(_events);
 
             serializedObject.ApplyModifiedProperties();
         }

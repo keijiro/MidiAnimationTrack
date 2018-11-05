@@ -1,12 +1,12 @@
 using System.Collections.Generic;
 
-namespace Klak.Midi
+namespace Klak.Timeline
 {
     static class MidiDeserializer
     {
         #region Public members
 
-        public static void Load(byte [] data, MidiAsset asset)
+        public static MidiAnimationClip [] Load(byte [] data)
         {
             var reader = new MidiDataReader(data);
 
@@ -30,19 +30,17 @@ namespace Klak.Midi
                 throw new System.FormatException ("SMPTE time code is not supported.");
 
             // Tracks
-            var tracks = new MidiTrack [trackCount];
+            var tracks = new MidiAnimationClip [trackCount];
             for (var i = 0; i < trackCount; i++) tracks[i] = ReadTrack(reader);
 
-            // Output
-            asset.ticksPerQuarterNote = tpqn;
-            asset.tracks = tracks;
+            return tracks;
         }
 
         #endregion
 
         #region Private members
         
-        static MidiTrack ReadTrack(MidiDataReader reader)
+        static MidiAnimationClip ReadTrack(MidiDataReader reader)
         {
             // Chunk type
             if (reader.ReadChars(4) != "MTrk")
@@ -88,7 +86,11 @@ namespace Klak.Midi
                 }
             }
 
-            return new MidiTrack { events = events.ToArray() };
+            // Create a clip instance for the track.
+            var track = UnityEngine.ScriptableObject.CreateInstance<MidiAnimationClip>();
+            track.template.events = events.ToArray();
+
+            return track;
         }
 
         #endregion

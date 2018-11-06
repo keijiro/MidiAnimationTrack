@@ -13,6 +13,12 @@ namespace Klak.Timeline
 
         #endregion
 
+        #region Public property
+
+        public float CurrentValue { get; private set; }
+
+        #endregion
+
         #region Internal state variables
 
         float _bpm;
@@ -34,7 +40,7 @@ namespace Klak.Timeline
             {
                 if (e.time > tick)
                 {
-                    Debug.Log(e);
+                    CurrentValue = (float)e.data2 / 127;
                     break;
                 }
             }

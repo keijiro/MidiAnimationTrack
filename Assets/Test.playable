@@ -41,8 +41,8 @@ MonoBehaviour:
   m_Clips:
   - m_Start: 0
     m_ClipIn: 0
-    m_Asset: {fileID: 11400004, guid: 58d1829ddc96d43dc802da1bd11f8ba6, type: 3}
-    m_Duration: 9.733333333333333
+    m_Asset: {fileID: 11400002, guid: 491cfc7a5db340a48ab9d8663763fd55, type: 3}
+    m_Duration: 8
     m_TimeScale: 1
     m_ParentTrack: {fileID: 114226482996241210}
     m_EaseInDuration: 0
@@ -111,3 +111,10 @@ MonoBehaviour:
   m_Version: 2
   template:
     bpm: 120
+    componentName: Transform
+    propertyName: localPosition
+    fieldName: m_LocalPosition
+    baseVector: {x: 0, y: 2, z: 0}
+    rotationAxis: {x: 0, y: 0, z: 1}
+    colorAt0: {r: 1, g: 0, b: 0, a: 1}
+    colorAt1: {r: 0, g: 0, b: 1, a: 1}

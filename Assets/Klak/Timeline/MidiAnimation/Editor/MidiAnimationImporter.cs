@@ -4,23 +4,23 @@ using System.IO;
 
 namespace Klak.Timeline
 {
-    [ScriptedImporter(1, "mid")]
+    [ScriptedImporter(0, "mid")]
     sealed class MidiAssetImporter : ScriptedImporter
     {
         public override void OnImportAsset(AssetImportContext context)
         {
-            var data = File.ReadAllBytes(context.assetPath);
-            var tracks = MidiDeserializer.Load(data);
-            if (tracks.Length == 0) return;
-
             var asset = ScriptableObject.CreateInstance<MidiAsset>();
-            asset.clips = tracks;
+            asset.clips = MidiDeserializer.Load(File.ReadAllBytes(context.assetPath));
 
             context.AddObjectToAsset("MidiAsset", asset);
-            for (var i = 0; i < tracks.Length; i++)
-                context.AddObjectToAsset("Track" + i, tracks[i]);
-
             context.SetMainObject(asset);
+
+            for (var i = 0; i < asset.clips.Length; i++)
+            {
+                var track = asset.clips[i];
+                track.name = "Track " + i;
+                context.AddObjectToAsset(track.name, track);
+            }
         }
     }
 }

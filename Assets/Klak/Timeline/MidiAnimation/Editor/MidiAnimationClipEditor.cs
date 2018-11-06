@@ -7,10 +7,12 @@ namespace Klak.Timeline
     [CustomEditor(typeof(MidiAnimationClip)), CanEditMultipleObjects]
     class MidiAnimationClipEditor : Editor
     {
+        SerializedProperty _tpqn;
         SerializedProperty _events;
 
         void OnEnable()
         {
+            _tpqn = serializedObject.FindProperty("template.ticksPerQuarterNote");
             _events = serializedObject.FindProperty("template.events");
         }
 
@@ -18,7 +20,8 @@ namespace Klak.Timeline
         {
             serializedObject.Update();
 
-            EditorGUILayout.PropertyField(_events);
+            EditorGUILayout.PropertyField(_tpqn);
+            EditorGUILayout.PropertyField(_events, true);
 
             serializedObject.ApplyModifiedProperties();
         }

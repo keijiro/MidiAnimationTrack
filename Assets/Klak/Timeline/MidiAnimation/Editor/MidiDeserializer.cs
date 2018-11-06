@@ -1,4 +1,6 @@
+using System;
 using System.Collections.Generic;
+using UnityEngine;
 
 namespace Klak.Timeline
 {
@@ -6,17 +8,17 @@ namespace Klak.Timeline
     {
         #region Public members
 
-        public static MidiAnimationClip [] Load(byte [] data)
+        public static MidiAsset Load(byte [] data)
         {
             var reader = new MidiDataReader(data);
 
             // Chunk type
             if (reader.ReadChars(4) != "MThd")
-                throw new System.FormatException("Can't find header chunk.");
+                throw new FormatException("Can't find header chunk.");
             
             // Chunk length
             if (reader.ReadBEUInt32() != 6u)
-                throw new System.FormatException("Length of header chunk must be 6.");
+                throw new FormatException("Length of header chunk must be 6.");
             
             // Format (unused)
             reader.Advance(2);
@@ -27,24 +29,28 @@ namespace Klak.Timeline
             // Ticks per quarter note
             var tpqn = reader.ReadBEUInt16();
             if ((tpqn & 0x8000u) != 0)
-                throw new System.FormatException ("SMPTE time code is not supported.");
+                throw new FormatException ("SMPTE time code is not supported.");
 
             // Tracks
             var tracks = new MidiAnimationClip [trackCount];
-            for (var i = 0; i < trackCount; i++) tracks[i] = ReadTrack(reader);
+            for (var i = 0; i < trackCount; i++)
+                tracks[i] = ReadTrack(reader, tpqn);
 
-            return tracks;
+            // Asset instantiation
+            var asset = ScriptableObject.CreateInstance<MidiAsset>();
+            asset.clips = tracks;
+            return asset;
         }
 
         #endregion
 
         #region Private members
         
-        static MidiAnimationClip ReadTrack(MidiDataReader reader)
+        static MidiAnimationClip ReadTrack(MidiDataReader reader, uint tpqn)
         {
             // Chunk type
             if (reader.ReadChars(4) != "MTrk")
-                throw new System.FormatException ("Can't find track chunk.");
+                throw new FormatException ("Can't find track chunk.");
             
             // Chunk length
             var chunkEnd = reader.ReadBEUInt32();
@@ -86,11 +92,11 @@ namespace Klak.Timeline
                 }
             }
 
-            // Create a clip instance for the track.
-            var track = UnityEngine.ScriptableObject.CreateInstance<MidiAnimationClip>();
-            track.template.events = events.ToArray();
-
-            return track;
+            // Asset instantiation
+            var asset = ScriptableObject.CreateInstance<MidiAnimationClip>();
+            asset.template.ticksPerQuarterNote = tpqn;
+            asset.template.events = events.ToArray();
+            return asset;
         }
 
         #endregion

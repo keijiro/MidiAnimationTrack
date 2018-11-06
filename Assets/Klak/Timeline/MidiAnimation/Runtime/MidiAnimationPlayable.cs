@@ -8,6 +8,7 @@ namespace Klak.Timeline
     {
         #region Serialized variables
 
+        public uint ticksPerQuarterNote;
         public MidiEvent [] events;
 
         #endregion

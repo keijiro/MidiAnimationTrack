@@ -10,8 +10,7 @@ namespace Klak.Timeline
 
         public override string ToString()
         {
-            return string.Format
-                ("[{0}: {1:X}, {2}, {3}]", time, status, data1, data2);
+            return string.Format("[{0}: {1:X}, {2}, {3}]", time, status, data1, data2);
         }
     }
 }

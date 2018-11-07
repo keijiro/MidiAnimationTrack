@@ -9,14 +9,42 @@ namespace Klak.Timeline
     [TrackBindingType(typeof(GameObject))]
     public class MidiAnimationTrack : TrackAsset
     {
+        #region Serialized object
+
         public MidiAnimationMixer template = new MidiAnimationMixer();
 
-        public override Playable CreateTrackMixer(PlayableGraph graph, GameObject go, int inputCount)
+        #endregion
+
+        #region TrackAsset implementation
+
+        public override Playable
+            CreateTrackMixer(PlayableGraph graph, GameObject go, int inputCount)
         {
-            return ScriptPlayable<MidiAnimationMixer>.Create(graph, template, inputCount);
+            return ScriptPlayable<MidiAnimationMixer>.
+                Create(graph, template, inputCount);
         }
 
-        public override void GatherProperties(PlayableDirector director, IPropertyCollector driver)
+        protected override void OnCreateClip(TimelineClip clip)
+        {
+            ((MidiAnimationClip)clip.asset).mixer = template;
+        }
+
+        #endregion
+
+        #region ISerializationCallbackReceiver
+
+        protected override void OnAfterTrackDeserialize()
+        {
+            foreach (var clip in GetClips())
+                ((MidiAnimationClip)clip.asset).mixer = template;
+        }
+
+        #endregion
+
+        #region IPropertyPreview implementation
+
+        public override void
+            GatherProperties(PlayableDirector director, IPropertyCollector driver)
         {
             if (string.IsNullOrEmpty(template.componentName)) return;
             if (string.IsNullOrEmpty(template.fieldName)) return;
@@ -29,5 +57,7 @@ namespace Klak.Timeline
 
             driver.AddFromName(component.GetType(), go, template.fieldName);
         }
+
+        #endregion
     }
 }

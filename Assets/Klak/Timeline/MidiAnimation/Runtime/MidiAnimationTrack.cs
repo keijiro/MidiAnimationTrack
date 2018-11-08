@@ -36,7 +36,10 @@ namespace Klak.Timeline
         protected override void OnAfterTrackDeserialize()
         {
             foreach (var clip in GetClips())
-                ((MidiAnimationClip)clip.asset).mixer = template;
+            {
+                var asset = clip.asset as MidiAnimationClip;
+                if (asset != null) asset.mixer = template;
+            }
         }
 
         #endregion

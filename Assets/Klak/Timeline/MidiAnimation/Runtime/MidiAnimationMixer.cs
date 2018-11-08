@@ -37,7 +37,7 @@ namespace Klak.Timeline
             for (var i = 0; i < playable.GetInputCount(); i++)
             {
                 var p = playable.GetInput(i);
-                var b = (ScriptPlayable<MidiAnimationPlayable>)p;
+                var b = (ScriptPlayable<MidiAnimation>)p;
                 acc += playable.GetInputWeight(i) * b.GetBehaviour().CurrentValue;
             }
 

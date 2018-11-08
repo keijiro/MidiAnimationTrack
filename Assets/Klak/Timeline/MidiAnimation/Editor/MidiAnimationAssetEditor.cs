@@ -4,8 +4,8 @@ using UnityEngine.Playables;
 
 namespace Klak.Timeline
 {
-    [CustomEditor(typeof(MidiAnimationClip)), CanEditMultipleObjects]
-    class MidiAnimationClipEditor : Editor
+    [CustomEditor(typeof(MidiAnimationAsset)), CanEditMultipleObjects]
+    class MidiAnimationAssetEditor : Editor
     {
         SerializedProperty _tpqn;
         SerializedProperty _events;

@@ -5,7 +5,7 @@ using UnityEngine.Timeline;
 namespace Klak.Timeline
 {
     [TrackColor(0.4f, 0.4f, 0.4f)]
-    [TrackClipType(typeof(MidiAnimationClip))]
+    [TrackClipType(typeof(MidiAnimationAsset))]
     [TrackBindingType(typeof(GameObject))]
     public class MidiAnimationTrack : TrackAsset
     {
@@ -26,7 +26,7 @@ namespace Klak.Timeline
 
         protected override void OnCreateClip(TimelineClip clip)
         {
-            ((MidiAnimationClip)clip.asset).mixer = template;
+            ((MidiAnimationAsset)clip.asset).mixer = template;
         }
 
         #endregion
@@ -37,7 +37,7 @@ namespace Klak.Timeline
         {
             foreach (var clip in GetClips())
             {
-                var asset = clip.asset as MidiAnimationClip;
+                var asset = clip.asset as MidiAnimationAsset;
                 if (asset != null) asset.mixer = template;
             }
         }

@@ -4,13 +4,13 @@ using UnityEngine;
 
 namespace Klak.Timeline
 {
-    static class MidiDeserializer
+    static class MidiFileDeserializer
     {
         #region Public members
 
-        public static MidiAsset Load(byte [] data)
+        public static MidiFileAsset Load(byte [] data)
         {
-            var reader = new MidiDataReader(data);
+            var reader = new MidiDataStreamReader(data);
 
             // Chunk type
             if (reader.ReadChars(4) != "MThd")
@@ -32,13 +32,13 @@ namespace Klak.Timeline
                 throw new FormatException ("SMPTE time code is not supported.");
 
             // Tracks
-            var tracks = new MidiAnimationClip [trackCount];
+            var tracks = new MidiAnimationAsset [trackCount];
             for (var i = 0; i < trackCount; i++)
                 tracks[i] = ReadTrack(reader, tpqn);
 
             // Asset instantiation
-            var asset = ScriptableObject.CreateInstance<MidiAsset>();
-            asset.clips = tracks;
+            var asset = ScriptableObject.CreateInstance<MidiFileAsset>();
+            asset.tracks = tracks;
             return asset;
         }
 
@@ -46,7 +46,7 @@ namespace Klak.Timeline
 
         #region Private members
         
-        static MidiAnimationClip ReadTrack(MidiDataReader reader, uint tpqn)
+        static MidiAnimationAsset ReadTrack(MidiDataStreamReader reader, uint tpqn)
         {
             // Chunk type
             if (reader.ReadChars(4) != "MTrk")
@@ -93,7 +93,7 @@ namespace Klak.Timeline
             }
 
             // Asset instantiation
-            var asset = ScriptableObject.CreateInstance<MidiAnimationClip>();
+            var asset = ScriptableObject.CreateInstance<MidiAnimationAsset>();
             asset.template.ticksPerQuarterNote = tpqn;
             asset.template.events = events.ToArray();
             return asset;

@@ -1,7 +1,7 @@
 namespace Klak.Timeline
 {
     // MIDI binary data stream reader
-    sealed class MidiDataReader
+    sealed class MidiDataStreamReader
     {
         #region Internal members
 
@@ -12,7 +12,7 @@ namespace Klak.Timeline
 
         #region Constructor
 
-        public MidiDataReader(byte [] data)
+        public MidiDataStreamReader(byte [] data)
         {
             _data = data;
             _stringBuilder = new System.Text.StringBuilder();

@@ -2,8 +2,8 @@ fileFormatVersion: 2
 guid: 7247f52fa539fdb428405ed8741489e6
 ScriptedImporter:
   fileIDToRecycleName:
-    11400000: MidiAsset
-    11400002: Track 1
+    11400004: MidiFileAsset
+    11400006: Track1
   externalObjects: {}
   userData: 
   assetBundleName: 

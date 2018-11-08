@@ -4,7 +4,7 @@ using UnityEngine.Playables;
 namespace Klak.Timeline
 {
     [System.Serializable]
-    public class MidiAnimationPlayable : PlayableBehaviour
+    public class MidiAnimation : PlayableBehaviour
     {
         #region Serialized variables
 

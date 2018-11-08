@@ -11,6 +11,8 @@ namespace Klak.Timeline
 
         public float bpm = 120;
 
+        public int controlNumber = 1;
+
         public string componentName;
         public string propertyName;
         public string fieldName;
@@ -36,9 +38,9 @@ namespace Klak.Timeline
 
             for (var i = 0; i < playable.GetInputCount(); i++)
             {
-                var p = playable.GetInput(i);
-                var b = (ScriptPlayable<MidiAnimation>)p;
-                acc += playable.GetInputWeight(i) * b.GetBehaviour().CurrentValue;
+                var clip = (ScriptPlayable<MidiAnimation>)playable.GetInput(i);
+                var value = clip.GetBehaviour().GetCCValue(clip, controlNumber);
+                acc += playable.GetInputWeight(i) * value;
             }
 
             var target = playerData as GameObject;

@@ -15,8 +15,6 @@ namespace Klak.Timeline
 
         #region Public properties and methods
 
-        public float CurrentValue { get; private set; }
-
         public float CalculateLastEventTime(float bpm)
         {
             return ConvertTicksToSecond(events[events.Length - 1].time, bpm);
@@ -28,11 +26,17 @@ namespace Klak.Timeline
 
         float _bpm;
 
-        int GetLastEventIndexBeforeTick(uint tick)
+        (int i0, int i1) GetEventIndexAroundTick(uint tick, int controlNumber)
         {
-            for (var i = 0; i < events.Length - 1; i++)
-                if (events[i].time > tick) return Mathf.Max(0, i - 1);
-            return events.Length - 2;
+            var last = -1;
+            for (var i = 0; i < events.Length; i++)
+            {
+                ref var e = ref events[i];
+                if (e.data1 != controlNumber) continue;
+                if (e.time > tick) return (last, i);
+                last = i;
+            }
+            return (last, last);
         }
 
         float ConvertTicksToSecond(uint tick)
@@ -55,15 +59,18 @@ namespace Klak.Timeline
             _bpm = mixer.GetBehaviour().bpm;
         }
 
-        public override void PrepareFrame(Playable playable, FrameData info)
+        public float GetCCValue(Playable playable, int controlNumber)
         {
             var t = (float)playable.GetTime() % CalculateLastEventTime(_bpm);
 
             var tick = (uint)(_bpm * t / 60 * ticksPerQuarterNote);
-            var i = GetLastEventIndexBeforeTick(tick);
+            var pair = GetEventIndexAroundTick(tick, controlNumber);
 
-            ref var e0 = ref events[i];
-            ref var e1 = ref events[i + 1];
+            if (pair.i0 < 0) return 0;
+            if (pair.i1 < 0) return events[pair.i0].data2 / 127.0f;
+
+            ref var e0 = ref events[pair.i0];
+            ref var e1 = ref events[pair.i1];
 
             var t0 = ConvertTicksToSecond(e0.time);
             var t1 = ConvertTicksToSecond(e1.time);
@@ -71,7 +78,7 @@ namespace Klak.Timeline
             var v0 = e0.data2 / 127.0f;
             var v1 = e1.data2 / 127.0f;
 
-            CurrentValue = Mathf.Lerp(v0, v1, Mathf.Clamp01((t - t0) / (t1 - t0)));
+            return Mathf.Lerp(v0, v1, Mathf.Clamp01((t - t0) / (t1 - t0)));
         }
 
         #endregion

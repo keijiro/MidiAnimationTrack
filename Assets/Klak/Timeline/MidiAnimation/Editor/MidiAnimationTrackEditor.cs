@@ -15,6 +15,8 @@ namespace Klak.Timeline
 
         SerializedProperty _bpm;
 
+        SerializedProperty _controlNumber;
+
         SerializedProperty _componentName;
         SerializedProperty _propertyName;
         SerializedProperty _fieldName;
@@ -39,6 +41,8 @@ namespace Klak.Timeline
         {
             _bpm = serializedObject.FindProperty("template.bpm");
 
+            _controlNumber = serializedObject.FindProperty("template.controlNumber");
+
             _componentName = serializedObject.FindProperty("template.componentName");
             _propertyName = serializedObject.FindProperty("template.propertyName");
             _fieldName = serializedObject.FindProperty("template.fieldName");
@@ -54,6 +58,7 @@ namespace Klak.Timeline
             serializedObject.Update();
 
             EditorGUILayout.PropertyField(_bpm);
+            EditorGUILayout.PropertyField(_controlNumber);
 
             // Retrieves the track-bound game object.
             var go = TimelineEditor.inspectedDirector?.

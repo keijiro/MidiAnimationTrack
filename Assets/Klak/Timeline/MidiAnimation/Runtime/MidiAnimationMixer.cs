@@ -5,12 +5,8 @@ using System.Reflection;
 namespace Klak.Timeline
 {
     [System.Serializable]
-    public class MidiAnimationMixer : PlayableBehaviour
+    public class MidiControl
     {
-        #region Serialized variables
-
-        public float bpm = 120;
-
         public int controlNumber = 1;
 
         public string componentName;
@@ -21,12 +17,15 @@ namespace Klak.Timeline
         public Vector3 rotationAxis = Vector3.forward;
         public Color colorAt0 = Color.red;
         public Color colorAt1 = Color.blue;
+    }
 
-        #endregion
+    [System.Serializable]
+    public class MidiAnimationMixer : PlayableBehaviour
+    {
+        #region Serialized variables
 
-        #region Private variables
-
-        PropertyInfo _targetProperty;
+        public float bpm = 120;
+        public MidiControl [] controls;
 
         #endregion
 
@@ -34,36 +33,34 @@ namespace Klak.Timeline
 
         public override void ProcessFrame(Playable playable, FrameData info, object playerData)
         {
-            var acc = 0.0f;
-
-            for (var i = 0; i < playable.GetInputCount(); i++)
-            {
-                var clip = (ScriptPlayable<MidiAnimation>)playable.GetInput(i);
-                var value = clip.GetBehaviour().GetCCValue(clip, controlNumber);
-                acc += playable.GetInputWeight(i) * value;
-            }
-
             var target = playerData as GameObject;
             if (target == null) return;
 
-            var component = target.GetComponent(componentName);
-            if (component == null) return;
-
-            if (_targetProperty == null)
-                _targetProperty = component.GetType().GetProperty(propertyName);
-
-            if (_targetProperty != null)
+            foreach (var ctrl in controls)
             {
-                if (_targetProperty.PropertyType == typeof(float))
-                    _targetProperty.SetValue(component, acc, null);
-                else if (_targetProperty.PropertyType == typeof(Vector3))
-                    _targetProperty.SetValue(component, baseVector * acc, null);
-                else if (_targetProperty.PropertyType == typeof(Quaternion))
-                    _targetProperty.SetValue
-                        (component, Quaternion.AngleAxis(acc, rotationAxis), null);
-                else if (_targetProperty.PropertyType == typeof(Color))
-                    _targetProperty.SetValue
-                        (component, Color.Lerp(colorAt0, colorAt1, acc), null);
+                var acc = 0.0f;
+
+                for (var i = 0; i < playable.GetInputCount(); i++)
+                {
+                    var clip = (ScriptPlayable<MidiAnimation>)playable.GetInput(i);
+                    var value = clip.GetBehaviour().GetCCValue(clip, ctrl.controlNumber);
+                    acc += playable.GetInputWeight(i) * value;
+                }
+
+                var component = target.GetComponent(ctrl.componentName);
+                if (component == null) continue;
+
+                var prop = component.GetType().GetProperty(ctrl.propertyName);
+                if (prop == null) continue;
+
+                if (prop.PropertyType == typeof(float))
+                    prop.SetValue(component, acc, null);
+                else if (prop.PropertyType == typeof(Vector3))
+                    prop.SetValue(component, ctrl.baseVector * acc, null);
+                else if (prop.PropertyType == typeof(Quaternion))
+                    prop.SetValue(component, Quaternion.AngleAxis(acc, ctrl.rotationAxis), null);
+                else if (prop.PropertyType == typeof(Color))
+                    prop.SetValue(component, Color.Lerp(ctrl.colorAt0, ctrl.colorAt1, acc), null);
             }
         }
 

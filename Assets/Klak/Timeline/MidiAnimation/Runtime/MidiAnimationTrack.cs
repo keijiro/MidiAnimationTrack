@@ -17,11 +17,9 @@ namespace Klak.Timeline
 
         #region TrackAsset implementation
 
-        public override Playable
-            CreateTrackMixer(PlayableGraph graph, GameObject go, int inputCount)
+        public override Playable CreateTrackMixer(PlayableGraph graph, GameObject go, int inputCount)
         {
-            return ScriptPlayable<MidiAnimationMixer>.
-                Create(graph, template, inputCount);
+            return ScriptPlayable<MidiAnimationMixer>.Create(graph, template, inputCount);
         }
 
         protected override void OnCreateClip(TimelineClip clip)
@@ -46,19 +44,23 @@ namespace Klak.Timeline
 
         #region IPropertyPreview implementation
 
-        public override void
-            GatherProperties(PlayableDirector director, IPropertyCollector driver)
+        public override void GatherProperties(PlayableDirector director, IPropertyCollector driver)
         {
-            if (string.IsNullOrEmpty(template.componentName)) return;
-            if (string.IsNullOrEmpty(template.fieldName)) return;
-                
             var go = director.GetGenericBinding(this) as GameObject;
             if (go == null) return;
 
-            var component = go.GetComponent(template.componentName);
-            if (component == null) return;
+            if (template.controls == null) return;
 
-            driver.AddFromName(component.GetType(), go, template.fieldName);
+            foreach (var ctrl in template.controls)
+            {
+                if (string.IsNullOrEmpty(ctrl.componentName)) continue;
+                if (string.IsNullOrEmpty(ctrl.fieldName)) continue;
+                    
+                var component = go.GetComponent(ctrl.componentName);
+                if (component == null) continue;
+
+                driver.AddFromName(component.GetType(), go, ctrl.fieldName);
+            }
         }
 
         #endregion

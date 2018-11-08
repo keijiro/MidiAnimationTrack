@@ -6,6 +6,7 @@ using UnityEngine;
 using UnityEngine.Playables;
 using UnityEngine.Timeline;
 
+/*
 namespace Klak.Timeline
 {
     [CustomEditor(typeof(MidiAnimationTrack))]
@@ -258,3 +259,4 @@ namespace Klak.Timeline
         #endregion
     }
 }
+*/

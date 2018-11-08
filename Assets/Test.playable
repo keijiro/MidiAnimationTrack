@@ -180,10 +180,20 @@ MonoBehaviour:
   m_Version: 2
   template:
     bpm: 180
-    componentName: Transform
-    propertyName: localPosition
-    fieldName: m_LocalPosition
-    baseVector: {x: 0, y: 2, z: 0}
-    rotationAxis: {x: 0, y: 2, z: 0}
-    colorAt0: {r: 1, g: 0, b: 0, a: 1}
-    colorAt1: {r: 0, g: 0, b: 1, a: 1}
+    controls:
+    - controlNumber: 20
+      componentName: Transform
+      propertyName: localPosition
+      fieldName: m_LocalPosition
+      baseVector: {x: 0, y: 2, z: 0}
+      rotationAxis: {x: 0, y: 0, z: 0}
+      colorAt0: {r: 0, g: 0, b: 0, a: 0}
+      colorAt1: {r: 0, g: 0, b: 0, a: 0}
+    - controlNumber: 20
+      componentName: Transform
+      propertyName: localScale
+      fieldName: m_LocalScale
+      baseVector: {x: 2, y: 2, z: 2}
+      rotationAxis: {x: 0, y: 0, z: 0}
+      colorAt0: {r: 0, g: 0, b: 0, a: 0}
+      colorAt1: {r: 0, g: 0, b: 0, a: 0}

@@ -22,10 +22,8 @@ namespace Klak.Timeline
             _propertyName  = property.FindPropertyRelative("propertyName");
             _fieldName     = property.FindPropertyRelative("fieldName");
 
-            _baseVector    = property.FindPropertyRelative("baseVector");
-            _rotationAxis  = property.FindPropertyRelative("rotationAxis");
-            _colorAt0      = property.FindPropertyRelative("colorAt0");
-            _colorAt1      = property.FindPropertyRelative("colorAt1");
+            _vector0       = property.FindPropertyRelative("vector0");
+            _vector1       = property.FindPropertyRelative("vector1");
         }
 
         public string ComponentName {
@@ -127,21 +125,63 @@ namespace Klak.Timeline
             var pidx = System.Array.IndexOf(_propertyNames, _propertyName.stringValue);
             var type = _propertyTypes[pidx];
 
-            if (type == SerializedPropertyType.Vector3)
+            var v0 = _vector0.vector4Value;
+            var v1 = _vector1.vector4Value;
+
+            if (type == SerializedPropertyType.Float)
             {
-                EditorGUI.PropertyField(_rect, _baseVector);
+                EditorGUI.BeginChangeCheck();
+                v0.x = EditorGUI.FloatField(_rect, "Value at 0", v0.x);
+                if (EditorGUI.EndChangeCheck()) _vector0.vector4Value = v0;
+
+                MoveRectToNextLine();
+
+                EditorGUI.BeginChangeCheck();
+                v1.x = EditorGUI.FloatField(_rect, "Value at 1", v1.x);
+                if (EditorGUI.EndChangeCheck()) _vector1.vector4Value = v1;
+
+                MoveRectToNextLine();
+            }
+            else if (type == SerializedPropertyType.Vector3)
+            {
+                EditorGUI.BeginChangeCheck();
+                v0 = EditorGUI.Vector3Field(_rect, "Vector at 0", v0);
+                if (EditorGUI.EndChangeCheck()) _vector0.vector4Value = v0;
+
+                MoveRectToNextLine();
+
+                EditorGUI.BeginChangeCheck();
+                v1 = EditorGUI.Vector3Field(_rect, "Vector at 1", v1);
+                if (EditorGUI.EndChangeCheck()) _vector1.vector4Value = v1;
+
                 MoveRectToNextLine();
             }
             else if (type == SerializedPropertyType.Quaternion)
             {
-                EditorGUI.PropertyField(_rect, _rotationAxis);
+                EditorGUI.BeginChangeCheck();
+                v0 = EditorGUI.Vector3Field(_rect, "Rotation at 0", v0);
+                if (EditorGUI.EndChangeCheck()) _vector0.vector4Value = v0;
+
+                MoveRectToNextLine();
+
+                EditorGUI.BeginChangeCheck();
+                v1 = EditorGUI.Vector3Field(_rect, "Rotation at 1", v1);
+                if (EditorGUI.EndChangeCheck()) _vector1.vector4Value = v1;
+
                 MoveRectToNextLine();
             }
             else if (type == SerializedPropertyType.Color)
             {
-                EditorGUI.PropertyField(_rect, _colorAt0);
+                EditorGUI.BeginChangeCheck();
+                v0 = EditorGUI.ColorField(_rect, "Color at 0", v0);
+                if (EditorGUI.EndChangeCheck()) _vector0.vector4Value = v0;
+
                 MoveRectToNextLine();
-                EditorGUI.PropertyField(_rect, _colorAt1);
+
+                EditorGUI.BeginChangeCheck();
+                v1 = EditorGUI.ColorField(_rect, "Color at 1", v1);
+                if (EditorGUI.EndChangeCheck()) _vector1.vector4Value = v1;
+
                 MoveRectToNextLine();
             }
         }
@@ -156,10 +196,8 @@ namespace Klak.Timeline
         public SerializedProperty _propertyName;
         public SerializedProperty _fieldName;
 
-        public SerializedProperty _baseVector;
-        public SerializedProperty _rotationAxis;
-        public SerializedProperty _colorAt0;
-        public SerializedProperty _colorAt1;
+        public SerializedProperty _vector0;
+        public SerializedProperty _vector1;
 
         // Used in component selection drop-down
         public string [] _componentNames;

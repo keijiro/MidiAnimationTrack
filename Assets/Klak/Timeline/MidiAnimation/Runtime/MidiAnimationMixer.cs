@@ -13,10 +13,8 @@ namespace Klak.Timeline
         public string propertyName;
         public string fieldName;
 
-        public Vector3 baseVector = Vector3.forward;
-        public Vector3 rotationAxis = Vector3.forward;
-        public Color colorAt0 = Color.red;
-        public Color colorAt1 = Color.blue;
+        public Vector4 vector0 = Vector3.zero;
+        public Vector4 vector1 = Vector3.forward;
     }
 
     [System.Serializable]
@@ -53,14 +51,16 @@ namespace Klak.Timeline
                 var prop = component.GetType().GetProperty(ctrl.propertyName);
                 if (prop == null) continue;
 
+                var v = Vector4.Lerp(ctrl.vector0, ctrl.vector1, acc);
+
                 if (prop.PropertyType == typeof(float))
-                    prop.SetValue(component, acc, null);
+                    prop.SetValue(component, v.x, null);
                 else if (prop.PropertyType == typeof(Vector3))
-                    prop.SetValue(component, ctrl.baseVector * acc, null);
+                    prop.SetValue(component, (Vector3)v, null);
                 else if (prop.PropertyType == typeof(Quaternion))
-                    prop.SetValue(component, Quaternion.AngleAxis(acc, ctrl.rotationAxis), null);
+                    prop.SetValue(component, Quaternion.Euler(v), null);
                 else if (prop.PropertyType == typeof(Color))
-                    prop.SetValue(component, Color.Lerp(ctrl.colorAt0, ctrl.colorAt1, acc), null);
+                    prop.SetValue(component, (Color)v, null);
             }
         }
 

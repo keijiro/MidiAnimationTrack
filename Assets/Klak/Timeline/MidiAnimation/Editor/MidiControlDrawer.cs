@@ -8,262 +8,307 @@ using UnityEngine.Timeline;
 
 namespace Klak.Timeline
 {
-    [CustomPropertyDrawer(typeof(MidiControl), true)] class MidiControlDrawer : PropertyDrawer
+    #region Property drawer for MidiControl
+
+    class MidiControlDrawer
     {
-        class DrawerState
+        #region Public properties and methods
+
+        public MidiControlDrawer(SerializedProperty property)
         {
-            public SerializedProperty controlNumber;
+            _controlNumber = property.FindPropertyRelative("controlNumber");
 
-            public SerializedProperty componentName;
-            public SerializedProperty propertyName;
-            public SerializedProperty fieldName;
+            _componentName = property.FindPropertyRelative("componentName");
+            _propertyName  = property.FindPropertyRelative("propertyName");
+            _fieldName     = property.FindPropertyRelative("fieldName");
 
-            public SerializedProperty baseVector;
-            public SerializedProperty rotationAxis;
-            public SerializedProperty colorAt0;
-            public SerializedProperty colorAt1;
+            _baseVector    = property.FindPropertyRelative("baseVector");
+            _rotationAxis  = property.FindPropertyRelative("rotationAxis");
+            _colorAt0      = property.FindPropertyRelative("colorAt0");
+            _colorAt1      = property.FindPropertyRelative("colorAt1");
+        }
 
-            // Used in component selection drop-down
-            public string [] componentNames;
-            public GameObject cachedGameObject;
+        public string ComponentName {
+            get { return _componentName?.stringValue; }
+        }
 
-            // Used in property selection drop-down
-            public string [] propertyNames;
-            public string [] propertyLabels;
-            public string [] fieldNames;
-            public SerializedPropertyType [] propertyTypes;
-            public System.Type cachedComponentType;
+        public void SetRect(Rect rect)
+        {
+            _rect = rect;
 
-            public DrawerState(SerializedProperty property)
+            // We only use single-line height controls.
+            _rect.height = EditorGUIUtility.singleLineHeight;
+        }
+
+        public float CalculateHeight()
+        {
+            return (EditorGUIUtility.singleLineHeight + 2) * 5 - 2;
+        }
+
+        #endregion
+
+        #region Simple UI methods for offline editing
+
+        public void DrawCommonSettings()
+        {
+            EditorGUI.PropertyField(_rect, _controlNumber);
+            MoveRectToNextLine();
+        }
+
+        public void DrawComponentField()
+        {
+            EditorGUI.PropertyField(_rect, _componentName);
+            MoveRectToNextLine();
+        }
+
+        public void DrawPropertyField()
+        {
+            EditorGUI.PropertyField(_rect, _propertyName);
+            MoveRectToNextLine();
+        }
+
+        #endregion
+
+        #region Detailed UI methods for online editing
+
+        public void DrawComponentSelector(GameObject go)
+        {
+            CacheComponentsInGameObject(go);
+
+            // Component selection drop-down
+            var name = _componentName.stringValue;
+            var index0 = System.Array.IndexOf(_componentNames, name);
+            var index1 = EditorGUI.Popup
+                (_rect, "Component", Mathf.Max(0, index0), _componentNames);
+            MoveRectToNextLine();
+
+            // Update the target on a selection change.
+            if (index0 != index1)
             {
-                controlNumber = property.FindPropertyRelative("controlNumber");
-
-                componentName = property.FindPropertyRelative("componentName");
-                propertyName  = property.FindPropertyRelative("propertyName");
-                fieldName     = property.FindPropertyRelative("fieldName");
-
-                baseVector    = property.FindPropertyRelative("baseVector");
-                rotationAxis  = property.FindPropertyRelative("rotationAxis");
-                colorAt0      = property.FindPropertyRelative("colorAt0");
-                colorAt1      = property.FindPropertyRelative("colorAt1");
-            }
-
-            //
-            // Guess a property name from a given field name.
-            //
-            // As far as we know, there are four types of naming conventions for
-            // a serialized field name.
-            //
-            // - Simple camelCase: "fooBar"
-            // - Simple PascalCase: "FooBar"
-            // - Space separated: "foo bar"
-            // - Hangarion fashioned: "m_fooBar", "_fooBar", "fooBar_"
-            //
-            // This function converts them into a simple camelCased name.
-            //
-            static string FieldToPropertyName(string name)
-            {
-                // Remove Hangarian-fashioned pre/post-fixes.
-                if (name.StartsWith("m_"))
-                    name = name.Substring(2);
-                else if (name.StartsWith("_"))
-                    name = name.Substring(1);
-                else if (name.EndsWith("_"))
-                    name = name.Substring(0, name.Length - 1);
-
-                // Split the name into words and normalize the head characters.
-                var words = name.Split();
-                for (var i = 0; i < words.Length; i++)
-                {
-                    var w = words[i];
-                    words[i] = (i == 0 ? System.Char.ToLower(w[0]) :
-                                         System.Char.ToUpper(w[0])) + w.Substring(1);
-                }
-                name = string.Join("", words);
-
-                // We know Unity has some spelling inconsistencies. Let us solve it.
-                if (name == "backGroundColor") name = "backgroundColor"; // Camera.backgroundColor
-
-                return name;
-            }
-
-            // Check if the property type is supported one.
-            static bool IsPropertyTypeSupported(SerializedPropertyType type)
-            {
-                return type == SerializedPropertyType.Float ||
-                       type == SerializedPropertyType.Vector3 ||
-                       type == SerializedPropertyType.Quaternion ||
-                       type == SerializedPropertyType.Color;
-            }
-
-            // Enumerate components attached to a given game object.
-            public void CacheComponentsInGameObject(GameObject go)
-            {
-                if (cachedGameObject == go) return;
-
-                componentNames = go.GetComponents<Component>().
-                    Select(x => x.GetType().Name).ToArray();
-
-                cachedGameObject = go;
-            }
-
-            // Enumerate component properties that have corresponding serialized
-            // fields.
-            public void CachePropertiesInComponent(Component component)
-            {
-                var componentType = component.GetType();
-
-                if (cachedComponentType == componentType) return;
-
-                var itr = (new SerializedObject(component)).GetIterator();
-
-                var pnames = new List<string>();
-                var labels = new List<string>();
-                var fnames = new List<string>();
-                var types = new List<SerializedPropertyType>();
-
-                if (itr.NextVisible(true))
-                {
-                    while (true)
-                    {
-                        var type = itr.propertyType;
-                        if (IsPropertyTypeSupported(type))
-                        {
-                            // Check if the field has a corresponding property.
-                            var pname = FieldToPropertyName(itr.name);
-                            if (componentType.GetProperty(pname) != null)
-                            {
-                                // Append this field.
-                                pnames.Add(pname);
-                                labels.Add(ObjectNames.NicifyVariableName(pname));
-                                fnames.Add(itr.name);
-                                types.Add(type);
-                            }
-                        }
-
-                        if (!itr.NextVisible(false)) break;
-                    }
-
-                    propertyNames = pnames.ToArray();
-                    propertyLabels = labels.ToArray();
-                    fieldNames = fnames.ToArray();
-                    propertyTypes = types.ToArray();
-                }
-                else
-                {
-                    // Failed to retrieve properties.
-                    propertyNames = fieldNames = propertyLabels = new string [0];
-                    propertyTypes = new SerializedPropertyType [0];
-                }
-
-                cachedComponentType = componentType;
+                _componentName.stringValue = _componentNames[index1];
+                TimelineEditor.Refresh(RefreshReason.ContentsModified);
             }
         }
 
-        Dictionary<string, DrawerState> _drawerStates = new Dictionary<string, DrawerState>();
-
-        public override void OnGUI(Rect rect, SerializedProperty prop, GUIContent label)
+        public void DrawPropertySelector(Component component)
         {
-            // Retrieve drawer state.
-            DrawerState state;
-            _drawerStates.TryGetValue(prop.propertyPath, out state);
-            if (state == null) state = new DrawerState(prop);
+            CachePropertiesInComponent(component);
 
-            // We only use single-line height controls.
-            rect.height = EditorGUIUtility.singleLineHeight;
-
-            // Control number edit
-            EditorGUI.PropertyField(rect, state.controlNumber);
-            rect.y += EditorGUIUtility.singleLineHeight + 2;
-
-            // Retrieve the track-bound game object.
-            var target = (TrackAsset)prop.serializedObject.targetObject;
-            var go = TimelineEditor.inspectedDirector?.GetGenericBinding(target) as GameObject;
-
-            if (go == null)
+            if (_propertyNames.Length == 0)
             {
-                // No game object: Simply present a normal text field.
-                EditorGUI.PropertyField(rect, state.componentName);
+                // There is no supported property in the component.
+                // Clear the property selection.
+                _propertyName.stringValue = "";
+                _fieldName.stringValue = "";
             }
             else
             {
-                // Retrieve and cache components in the game object.
-                state.CacheComponentsInGameObject(go);
-
-                // Component selection drop-down
-                var name = state.componentName.stringValue;
-                var index0 = System.Array.IndexOf(state.componentNames, name);
-                var index1 = EditorGUI.Popup(
-                    rect, "Component",
-                    Mathf.Max(0, index0),
-                    state.componentNames
-                );
+                // Property selection drop-down
+                var name = _propertyName.stringValue;
+                var index0 = System.Array.IndexOf(_propertyNames, name);
+                var index1 = EditorGUI.Popup
+                    (_rect, "Property", Mathf.Max(index0, 0), _propertyLabels);
+                MoveRectToNextLine();
 
                 // Update the target on selection changes.
                 if (index0 != index1)
                 {
-                    state.componentName.stringValue = state.componentNames[index1];
+                    _propertyName.stringValue = _propertyNames[index1];
+                    _fieldName.stringValue = _fieldNames[index1];
                     TimelineEditor.Refresh(RefreshReason.ContentsModified);
                 }
             }
+        }
 
-            rect.y += EditorGUIUtility.singleLineHeight + 2;
+        public void DrawPropertyOptions()
+        {
+            if (_propertyTypes.Length == 0) return;
 
-            var component = go?.GetComponent(state.componentName.stringValue);
+            var pidx = System.Array.IndexOf(_propertyNames, _propertyName.stringValue);
+            var type = _propertyTypes[pidx];
 
-            if (component == null)
+            if (type == SerializedPropertyType.Vector3)
             {
-                // No component selection: Simple present a normal text field.
-                EditorGUI.PropertyField(rect, state.propertyName);
+                EditorGUI.PropertyField(_rect, _baseVector);
+                MoveRectToNextLine();
+            }
+            else if (type == SerializedPropertyType.Quaternion)
+            {
+                EditorGUI.PropertyField(_rect, _rotationAxis);
+                MoveRectToNextLine();
+            }
+            else if (type == SerializedPropertyType.Color)
+            {
+                EditorGUI.PropertyField(_rect, _colorAt0);
+                MoveRectToNextLine();
+                EditorGUI.PropertyField(_rect, _colorAt1);
+                MoveRectToNextLine();
+            }
+        }
+
+        #endregion
+
+        #region Private members
+
+        public SerializedProperty _controlNumber;
+
+        public SerializedProperty _componentName;
+        public SerializedProperty _propertyName;
+        public SerializedProperty _fieldName;
+
+        public SerializedProperty _baseVector;
+        public SerializedProperty _rotationAxis;
+        public SerializedProperty _colorAt0;
+        public SerializedProperty _colorAt1;
+
+        // Used in component selection drop-down
+        public string [] _componentNames;
+        public GameObject _cachedGameObject;
+
+        // Used in property selection drop-down
+        public string [] _propertyNames;
+        public string [] _propertyLabels;
+        public string [] _fieldNames;
+        public SerializedPropertyType [] _propertyTypes;
+        public System.Type _cachedComponentType;
+
+        Rect _rect;
+
+        void MoveRectToNextLine()
+        {
+            _rect.y += EditorGUIUtility.singleLineHeight + 2;
+        }
+
+        // Enumerate components attached to a given game object.
+        void CacheComponentsInGameObject(GameObject go)
+        {
+            if (_cachedGameObject == go) return;
+
+            _componentNames = go.GetComponents<Component>().
+                Select(x => x.GetType().Name).ToArray();
+
+            _cachedGameObject = go;
+        }
+
+        // Enumerate component properties that have corresponding serialized
+        // fields.
+        void CachePropertiesInComponent(Component component)
+        {
+            var componentType = component.GetType();
+
+            if (_cachedComponentType == componentType) return;
+
+            var itr = (new SerializedObject(component)).GetIterator();
+
+            var pnames = new List<string>();
+            var labels = new List<string>();
+            var fnames = new List<string>();
+            var types = new List<SerializedPropertyType>();
+
+            if (itr.NextVisible(true))
+            {
+                while (true)
+                {
+                    var type = itr.propertyType;
+                    if (MidiEditorUtility.IsPropertyTypeSupported(type))
+                    {
+                        // Check if the field has a corresponding property.
+                        var pname = MidiEditorUtility.GuessPropertyNameFromFieldName(itr.name);
+                        if (componentType.GetProperty(pname) != null)
+                        {
+                            // Append this field.
+                            pnames.Add(pname);
+                            labels.Add(ObjectNames.NicifyVariableName(pname));
+                            fnames.Add(itr.name);
+                            types.Add(type);
+                        }
+                    }
+
+                    if (!itr.NextVisible(false)) break;
+                }
+
+                _propertyNames = pnames.ToArray();
+                _propertyLabels = labels.ToArray();
+                _fieldNames = fnames.ToArray();
+                _propertyTypes = types.ToArray();
             }
             else
             {
-                // Retrieve and cache properties in the component.
-                state.CachePropertiesInComponent(component);
-
-                if (state.propertyNames.Length == 0)
-                {
-                    // There is no supported property in the component.
-                    // Clear the property selection.
-                    state.propertyName.stringValue = "";
-                    state.fieldName.stringValue = "";
-                }
-                else
-                {
-                    // Property selection drop-down
-                    var name = state.propertyName.stringValue;
-                    var index0 = System.Array.IndexOf(state.propertyNames, name);
-                    var index1 = EditorGUI.Popup
-                        (rect, "Property", Mathf.Max(index0, 0), state.propertyLabels);
-
-                    // Update the target on selection changes.
-                    if (index0 != index1)
-                    {
-                        state.propertyName.stringValue = state.propertyNames[index1];
-                        state.fieldName.stringValue = state.fieldNames[index1];
-                        TimelineEditor.Refresh(RefreshReason.ContentsModified);
-                    }
-
-                    /*
-                    // Show additional options for non-float types.
-                    var type = _propertyTypes[index1];
-                    if (type == SerializedPropertyType.Vector3)
-                        EditorGUILayout.PropertyField(_baseVector);
-                    else if (type == SerializedPropertyType.Quaternion)
-                        EditorGUILayout.PropertyField(_rotationAxis);
-                    else if (type == SerializedPropertyType.Color)
-                    {
-                        EditorGUILayout.PropertyField(_colorAt0);
-                        EditorGUILayout.PropertyField(_colorAt1);
-                    }
-                    */
-                }
+                // Failed to retrieve properties.
+                _propertyNames = _fieldNames = _propertyLabels = new string [0];
+                _propertyTypes = new SerializedPropertyType [0];
             }
+
+            _cachedComponentType = componentType;
+        }
+
+        #endregion
+    }
+
+    #endregion
+
+    #region Custom property drawer class (works as entry points)
+
+    [CustomPropertyDrawer(typeof(MidiControl), true)]
+    class MidiControlDrawerEntry : PropertyDrawer
+    {
+        Dictionary<string, MidiControlDrawer> _drawers = new Dictionary<string, MidiControlDrawer>();
+
+        MidiControlDrawer GetCachedDrawer(SerializedProperty property)
+        {
+            MidiControlDrawer drawer;
+
+            var path = property.propertyPath;
+            _drawers.TryGetValue(path, out drawer);
+
+            if (drawer == null)
+            {
+                // No instance was found witht the given path,
+                // so create a new instance for it.
+                drawer = new MidiControlDrawer(property);
+                _drawers[path] = drawer;
+            }
+
+            return drawer;
+        }
+
+        public override void OnGUI(Rect rect, SerializedProperty property, GUIContent label)
+        {
+            var drawer = GetCachedDrawer(property);
+
+            drawer.SetRect(rect);
+
+            // Common settings
+            drawer.DrawCommonSettings();
+
+            // Track-bound game object
+            var target = (TrackAsset)property.serializedObject.targetObject;
+            var go = TimelineEditor.inspectedDirector?.GetGenericBinding(target) as GameObject;
+
+            // Component selector
+            if (go == null)
+                drawer.DrawComponentField();
+            else
+                drawer.DrawComponentSelector(go);
+
+            // Selected component
+            var component = go?.GetComponent(drawer.ComponentName);
+
+            // Property selector
+            if (component == null)
+                drawer.DrawPropertyField();
+            else
+                drawer.DrawPropertySelector(component);
+
+            // Property options
+            drawer.DrawPropertyOptions();
         }
 
         public override float GetPropertyHeight(SerializedProperty property, GUIContent label)
         {
-            return EditorGUIUtility.singleLineHeight * 3 + 2 * 2;
+            return GetCachedDrawer(property).CalculateHeight();
         }
     }
+
+    #endregion
 }

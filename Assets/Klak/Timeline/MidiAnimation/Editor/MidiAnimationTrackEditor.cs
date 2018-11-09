@@ -1,3 +1,4 @@
+using UnityEngine;
 using UnityEditor;
 
 namespace Klak.Timeline
@@ -19,7 +20,19 @@ namespace Klak.Timeline
             serializedObject.Update();
 
             EditorGUILayout.PropertyField(_bpm);
-            EditorGUILayout.PropertyField(_controls, true);
+
+            for (var i = 0; i < _controls.arraySize; i++)
+            {
+                EditorGUILayout.Space();
+                EditorGUILayout.PropertyField(_controls.GetArrayElementAtIndex(i));
+                if (GUILayout.Button("Remove", GUILayout.Width(80)))
+                    _controls.DeleteArrayElementAtIndex(i);
+            }
+
+            EditorGUILayout.Space();
+
+            if (GUILayout.Button("Add Control"))
+                _controls.InsertArrayElementAtIndex(_controls.arraySize);
 
             serializedObject.ApplyModifiedProperties();
         }

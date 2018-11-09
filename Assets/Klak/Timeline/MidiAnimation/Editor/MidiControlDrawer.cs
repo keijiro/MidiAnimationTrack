@@ -40,7 +40,10 @@ namespace Klak.Timeline
 
         public float CalculateHeight()
         {
-            return (EditorGUIUtility.singleLineHeight + 2) * 5 - 2;
+            if (EditorGUIUtility.wideMode)
+                return EditorGUIUtility.singleLineHeight * 5 + 2 * 4;
+            else
+                return EditorGUIUtility.singleLineHeight * 7 + 2 * 4;
         }
 
         #endregion
@@ -135,12 +138,14 @@ namespace Klak.Timeline
                 if (EditorGUI.EndChangeCheck()) _vector0.vector4Value = v0;
 
                 MoveRectToNextLine();
+                MoveRectToNextLineInNarrowMode();
 
                 EditorGUI.BeginChangeCheck();
                 v1.x = EditorGUI.FloatField(_rect, "Value at 1", v1.x);
                 if (EditorGUI.EndChangeCheck()) _vector1.vector4Value = v1;
 
                 MoveRectToNextLine();
+                MoveRectToNextLineInNarrowMode();
             }
             else if (type == SerializedPropertyType.Vector3)
             {
@@ -149,12 +154,14 @@ namespace Klak.Timeline
                 if (EditorGUI.EndChangeCheck()) _vector0.vector4Value = v0;
 
                 MoveRectToNextLine();
+                MoveRectToNextLineInNarrowMode();
 
                 EditorGUI.BeginChangeCheck();
                 v1 = EditorGUI.Vector3Field(_rect, "Vector at 1", v1);
                 if (EditorGUI.EndChangeCheck()) _vector1.vector4Value = v1;
 
                 MoveRectToNextLine();
+                MoveRectToNextLineInNarrowMode();
             }
             else if (type == SerializedPropertyType.Quaternion)
             {
@@ -163,12 +170,14 @@ namespace Klak.Timeline
                 if (EditorGUI.EndChangeCheck()) _vector0.vector4Value = v0;
 
                 MoveRectToNextLine();
+                MoveRectToNextLineInNarrowMode();
 
                 EditorGUI.BeginChangeCheck();
                 v1 = EditorGUI.Vector3Field(_rect, "Rotation at 1", v1);
                 if (EditorGUI.EndChangeCheck()) _vector1.vector4Value = v1;
 
                 MoveRectToNextLine();
+                MoveRectToNextLineInNarrowMode();
             }
             else if (type == SerializedPropertyType.Color)
             {
@@ -177,12 +186,14 @@ namespace Klak.Timeline
                 if (EditorGUI.EndChangeCheck()) _vector0.vector4Value = v0;
 
                 MoveRectToNextLine();
+                MoveRectToNextLineInNarrowMode();
 
                 EditorGUI.BeginChangeCheck();
                 v1 = EditorGUI.ColorField(_rect, "Color at 1", v1);
                 if (EditorGUI.EndChangeCheck()) _vector1.vector4Value = v1;
 
                 MoveRectToNextLine();
+                MoveRectToNextLineInNarrowMode();
             }
         }
 
@@ -215,6 +226,12 @@ namespace Klak.Timeline
         void MoveRectToNextLine()
         {
             _rect.y += EditorGUIUtility.singleLineHeight + 2;
+        }
+
+        void MoveRectToNextLineInNarrowMode()
+        {
+            if (!EditorGUIUtility.wideMode)
+                _rect.y += EditorGUIUtility.singleLineHeight;
         }
 
         // Enumerate components attached to a given game object.

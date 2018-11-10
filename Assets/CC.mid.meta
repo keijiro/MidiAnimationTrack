@@ -1,11 +1,12 @@
 fileFormatVersion: 2
-guid: 7247f52fa539fdb428405ed8741489e6
+guid: dc696d2c62fd08d499ee48d20cb94511
 ScriptedImporter:
   fileIDToRecycleName:
-    11400004: MidiFileAsset
-    11400006: Track1
+    11400000: MidiFileAsset
+    11400002: CC Track 1
   externalObjects: {}
   userData: 
   assetBundleName: 
   assetBundleVariant: 
   script: {fileID: 11500000, guid: 6782f17a22ce146e887bd8530aa7cadc, type: 3}
+  _tempo: 120

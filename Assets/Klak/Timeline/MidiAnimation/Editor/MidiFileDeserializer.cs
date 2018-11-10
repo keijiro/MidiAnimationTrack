@@ -58,13 +58,13 @@ namespace Klak.Timeline
 
             // MIDI event sequence
             var events = new List<MidiEvent>();
-            var tick = 0u;
+            var ticks = 0u;
             var stat = (byte)0;
 
             while (reader.Position < chunkEnd)
             {
                 // Delta time
-                tick += reader.ReadMultiByteValue();
+                ticks += reader.ReadMultiByteValue();
 
                 // Status byte
                 if ((reader.PeekByte() & 0x80u) != 0)
@@ -87,13 +87,18 @@ namespace Klak.Timeline
                     var b1 = reader.ReadByte();
                     var b2 = (stat & 0xe0u) == 0xc0u ? (byte)0 : reader.ReadByte();
                     events.Add(new MidiEvent {
-                        time = tick, status = stat, data1 = b1, data2 = b2
+                        time = ticks, status = stat, data1 = b1, data2 = b2
                     });
                 }
             }
 
+            // Quantize duration with bars.
+            var bars = (ticks + tpqn * 4 - 1) / (tpqn * 4);
+
             // Asset instantiation
             var asset = ScriptableObject.CreateInstance<MidiAnimationAsset>();
+            asset.template.tempo = 120;
+            asset.template.duration = bars * tpqn * 4;
             asset.template.ticksPerQuarterNote = tpqn;
             asset.template.events = events.ToArray();
             return asset;

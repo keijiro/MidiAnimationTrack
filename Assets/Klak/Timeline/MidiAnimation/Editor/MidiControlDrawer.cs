@@ -68,6 +68,23 @@ namespace Klak.Timeline
             MoveRectToNextLine();
         }
 
+        public void DrawPropertyVectorFields()
+        {
+            EditorGUI.BeginChangeCheck();
+            var v0 = EditorGUI.Vector4Field(_rect, "Values at 0", _vector0.vector4Value);
+            if (EditorGUI.EndChangeCheck()) _vector0.vector4Value = v0;
+
+            MoveRectToNextLine();
+            MoveRectToNextLineInNarrowMode();
+
+            EditorGUI.BeginChangeCheck();
+            var v1 = EditorGUI.Vector4Field(_rect, "Values at 1", _vector1.vector4Value);
+            if (EditorGUI.EndChangeCheck()) _vector1.vector4Value = v1;
+
+            MoveRectToNextLine();
+            MoveRectToNextLineInNarrowMode();
+        }
+
         #endregion
 
         #region Detailed UI methods for online editing
@@ -349,14 +366,17 @@ namespace Klak.Timeline
             // Selected component
             var component = go?.GetComponent(drawer.ComponentName);
 
-            // Property selector
+            // Property selector and options
             if (component == null)
+            {
                 drawer.DrawPropertyField();
+                drawer.DrawPropertyVectorFields();
+            }
             else
+            {
                 drawer.DrawPropertySelector(component);
-
-            // Property options
-            drawer.DrawPropertyOptions();
+                drawer.DrawPropertyOptions();
+            }
         }
 
         public override float GetPropertyHeight(SerializedProperty property, GUIContent label)

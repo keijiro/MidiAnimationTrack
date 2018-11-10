@@ -8,16 +8,24 @@ namespace Klak.Timeline
     [CustomEditor(typeof(MidiAnimationAsset))]
     class MidiAnimationAssetEditor : Editor
     {
-        string _text;
+        string _tempoText;
+        string _durationText;
+        string _noteText;
+        string _ccText;
 
         void OnEnable()
         {
-            var events = ((MidiAnimationAsset)target).template.events;
+            var asset = ((MidiAnimationAsset)target).template;
+
+            _tempoText = asset.tempo.ToString();
+
+            var bars = (float)asset.duration / (asset.ticksPerQuarterNote * 4);
+            _durationText = bars.ToString() + (bars > 1 ? " bars" : " bar");
 
             var note = new HashSet<int>();
             var cc = new HashSet<int>();
 
-            foreach (var e in events)
+            foreach (var e in asset.events)
             {
                 switch (e.status & 0xf0u)
                 {
@@ -27,21 +35,19 @@ namespace Klak.Timeline
                 }
             }
 
-            if (note.Count > 0 || cc.Count > 0)
-            {
-                _text = "This MIDI sequence contains the following types of events.";
-                if (note.Count > 0) _text += "\nNote: " + string.Join(", ", note.OrderBy(x => x));
-                if (cc.Count > 0) _text += "\nCC: " + string.Join(", ", cc.OrderBy(x => x));
-            }
-            else
-            {
-                _text = "This MIDI sequence doesn't contain any supported event.";
-            }
+            _noteText = note.Count == 0 ? "-" : string.Join(", ", note.OrderBy(x => x));
+            _ccText = cc.Count == 0 ? "-" : string.Join(", ", cc.OrderBy(x => x));
         }
 
         public override void OnInspectorGUI()
         {
-            EditorGUILayout.HelpBox(_text, MessageType.None);
+            EditorGUILayout.LabelField("Tempo", _tempoText);
+            EditorGUILayout.LabelField("Duration", _durationText);
+            EditorGUILayout.LabelField("Contained Events");
+            EditorGUI.indentLevel++;
+            EditorGUILayout.LabelField("Note", _noteText);
+            EditorGUILayout.LabelField("CC", _ccText);
+            EditorGUI.indentLevel--;
         }
     }
 }

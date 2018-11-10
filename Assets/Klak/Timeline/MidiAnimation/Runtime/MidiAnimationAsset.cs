@@ -13,16 +13,10 @@ namespace Klak.Timeline
 
         #endregion
 
-        #region Assembly internal-use variables
-
-        internal MidiAnimationMixer mixer { get; set; }
-
-        #endregion
-
         #region PlayableAsset implementation
 
         public override double duration {
-            get { return template.CalculateLastEventTime(mixer.bpm); }
+            get { return template.DurationInSecond; }
         }
 
         #endregion

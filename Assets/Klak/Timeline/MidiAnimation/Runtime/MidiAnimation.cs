@@ -8,23 +8,22 @@ namespace Klak.Timeline
     {
         #region Serialized variables
 
+        public float tempo;
+        public uint duration;
         public uint ticksPerQuarterNote;
         public MidiEvent [] events;
 
         #endregion
 
-        #region Public properties and methods
+        #region Public properties
 
-        public float CalculateLastEventTime(float bpm)
-        {
-            return ConvertTicksToSecond(events[events.Length - 1].time, bpm);
+        public float DurationInSecond {
+            get { return duration / tempo * 60 / ticksPerQuarterNote; }
         }
 
         #endregion
 
         #region Private variables and methods
-
-        float _bpm;
 
         (int i0, int i1) GetEventIndexAroundTick(uint tick, int controlNumber)
         {
@@ -41,29 +40,18 @@ namespace Klak.Timeline
 
         float ConvertTicksToSecond(uint tick)
         {
-            return ConvertTicksToSecond(tick, _bpm);
-        }
-
-        float ConvertTicksToSecond(uint tick, float bpm)
-        {
-            return tick * 60 / (bpm * ticksPerQuarterNote);
+            return tick * 60 / (tempo * ticksPerQuarterNote);
         }
 
         #endregion
 
         #region PlayableBehaviour overrides
 
-        public override void OnGraphStart(Playable playable)
-        {
-            var mixer = (ScriptPlayable<MidiAnimationMixer>)playable.GetOutput(0);
-            _bpm = mixer.GetBehaviour().bpm;
-        }
-
         public float GetCCValue(Playable playable, int controlNumber)
         {
-            var t = (float)playable.GetTime() % CalculateLastEventTime(_bpm);
+            var t = (float)playable.GetTime() % DurationInSecond;
 
-            var tick = (uint)(_bpm * t / 60 * ticksPerQuarterNote);
+            var tick = (uint)(tempo * t / 60 * ticksPerQuarterNote);
             var pair = GetEventIndexAroundTick(tick, controlNumber);
 
             if (pair.i0 < 0) return 0;

@@ -8,21 +8,16 @@ namespace Klak.Timeline
     {
         #region Editor implementation
 
-        SerializedProperty _bpm;
         SerializedProperty _controls;
 
         void OnEnable()
         {
-            _bpm = serializedObject.FindProperty("template.bpm");
             _controls = serializedObject.FindProperty("template.controls");
         }
 
         public override void OnInspectorGUI()
         {
             serializedObject.Update();
-
-            EditorGUILayout.PropertyField(_bpm);
-            EditorGUILayout.Space();
 
             for (var i = 0; i < _controls.arraySize; i++)
             {

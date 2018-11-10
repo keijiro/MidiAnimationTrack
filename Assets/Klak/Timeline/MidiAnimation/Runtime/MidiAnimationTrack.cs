@@ -22,24 +22,6 @@ namespace Klak.Timeline
             return ScriptPlayable<MidiAnimationMixer>.Create(graph, template, inputCount);
         }
 
-        protected override void OnCreateClip(TimelineClip clip)
-        {
-            ((MidiAnimationAsset)clip.asset).mixer = template;
-        }
-
-        #endregion
-
-        #region ISerializationCallbackReceiver
-
-        protected override void OnAfterTrackDeserialize()
-        {
-            foreach (var clip in GetClips())
-            {
-                var asset = clip.asset as MidiAnimationAsset;
-                if (asset != null) asset.mixer = template;
-            }
-        }
-
         #endregion
 
         #region IPropertyPreview implementation

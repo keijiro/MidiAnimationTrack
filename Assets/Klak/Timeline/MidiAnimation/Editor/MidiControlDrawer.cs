@@ -102,10 +102,7 @@ namespace Klak.Timeline
 
             // Update the target on a selection change.
             if (index0 != index1)
-            {
                 _componentName.stringValue = _componentNames[index1];
-                TimelineEditor.Refresh(RefreshReason.ContentsModified);
-            }
         }
 
         public void DrawPropertySelector(Component component)
@@ -133,7 +130,6 @@ namespace Klak.Timeline
                 {
                     _propertyName.stringValue = _propertyNames[index1];
                     _fieldName.stringValue = _fieldNames[index1];
-                    TimelineEditor.Refresh(RefreshReason.ContentsModified);
                 }
             }
         }

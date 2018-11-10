@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEditor;
+using UnityEditor.Timeline;
 
 namespace Klak.Timeline
 {
@@ -19,6 +20,9 @@ namespace Klak.Timeline
         {
             serializedObject.Update();
 
+            EditorGUI.BeginChangeCheck();
+
+
             for (var i = 0; i < _controls.arraySize; i++)
             {
                 DrawSplitter();
@@ -27,6 +31,9 @@ namespace Klak.Timeline
                 EditorGUILayout.PropertyField(_controls.GetArrayElementAtIndex(i));
                 EditorGUILayout.Space();
             }
+
+            if (EditorGUI.EndChangeCheck())
+                TimelineEditor.Refresh(RefreshReason.ContentsModified);
 
             DrawSplitter();
 

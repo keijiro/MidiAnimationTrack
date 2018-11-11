@@ -1,0 +1,12 @@
+fileFormatVersion: 2
+guid: 05871e178a21e144492a6044cc6a7a4f
+ScriptedImporter:
+  fileIDToRecycleName:
+    11400000: MidiFileAsset
+    11400002: Note Track 1
+  externalObjects: {}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+  script: {fileID: 11500000, guid: 6782f17a22ce146e887bd8530aa7cadc, type: 3}
+  _tempo: 120

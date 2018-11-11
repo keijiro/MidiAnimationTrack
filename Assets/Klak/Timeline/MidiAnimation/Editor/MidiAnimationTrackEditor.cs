@@ -9,10 +9,12 @@ namespace Klak.Timeline
     {
         #region Editor implementation
 
+        SerializedProperty _controlMode;
         SerializedProperty _controls;
 
         void OnEnable()
         {
+            _controlMode = serializedObject.FindProperty("template.controlMode");
             _controls = serializedObject.FindProperty("template.controls");
         }
 
@@ -20,8 +22,12 @@ namespace Klak.Timeline
         {
             serializedObject.Update();
 
-            EditorGUI.BeginChangeCheck();
+            EditorGUILayout.PropertyField(_controlMode);
+            EditorGUILayout.Space();
 
+            MidiControlDrawer.ControlMode = (MidiControlMode)_controlMode.enumValueIndex;
+
+            EditorGUI.BeginChangeCheck();
 
             for (var i = 0; i < _controls.arraySize; i++)
             {

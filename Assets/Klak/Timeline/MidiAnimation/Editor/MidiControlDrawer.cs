@@ -17,6 +17,8 @@ namespace Klak.Timeline
         public MidiControlDrawer(SerializedProperty property)
         {
             _controlNumber = property.FindPropertyRelative("controlNumber");
+            _octave        = property.FindPropertyRelative("octave");
+            _noteNumber    = property.FindPropertyRelative("noteNumber");
 
             _targetComponent = property.FindPropertyRelative("targetComponent");
             _propertyName    = property.FindPropertyRelative("propertyName");
@@ -25,6 +27,8 @@ namespace Klak.Timeline
             _vector0 = property.FindPropertyRelative("vector0");
             _vector1 = property.FindPropertyRelative("vector1");
         }
+
+        public static MidiControlMode ControlMode { get; set; }
 
         public Component TargetComponent {
             get { return (Component)(_targetComponent.exposedReferenceValue); }
@@ -50,10 +54,35 @@ namespace Klak.Timeline
 
         #region Simple UI methods for offline editing
 
+
         public void DrawCommonSettings()
         {
-            EditorGUI.PropertyField(_rect, _controlNumber);
-            MoveRectToNextLine();
+            if (ControlMode == MidiControlMode.ControlChange)
+            {
+                EditorGUI.PropertyField(_rect, _controlNumber);
+                MoveRectToNextLine();
+            }
+            else
+            {
+                EditorGUI.PrefixLabel(_rect, _labelNoteOctave);
+
+                // Half width control rect
+                var r = _rect;
+                r.x += EditorGUIUtility.labelWidth;
+                r.width = (r.width - EditorGUIUtility.labelWidth - 4) / 2;
+
+                // Note name drop down
+                EditorGUI.BeginChangeCheck();
+                var note = EditorGUI.IntPopup(r, _noteNumber.intValue, _noteLabels, _noteValues);
+                if (EditorGUI.EndChangeCheck()) _noteNumber.intValue = note;
+                r.x += r.width + 4;
+
+                // Octave drop down
+                EditorGUI.BeginChangeCheck();
+                var octave = EditorGUI.IntPopup(r, _octave.intValue, _octaveLabels, _octaveValues);
+                if (EditorGUI.EndChangeCheck()) _octave.intValue = octave;
+                MoveRectToNextLine();
+            }
 
             EditorGUI.PropertyField(_rect, _targetComponent, _labelTarget);
             MoveRectToNextLine();
@@ -63,23 +92,6 @@ namespace Klak.Timeline
         {
             EditorGUI.PropertyField(_rect, _propertyName);
             MoveRectToNextLine();
-        }
-
-        public void DrawPropertyVectorFields()
-        {
-            EditorGUI.BeginChangeCheck();
-            var v0 = EditorGUI.Vector4Field(_rect, "Values at 0", _vector0.vector4Value);
-            if (EditorGUI.EndChangeCheck()) _vector0.vector4Value = v0;
-
-            MoveRectToNextLine();
-            MoveRectToNextLineInNarrowMode();
-
-            EditorGUI.BeginChangeCheck();
-            var v1 = EditorGUI.Vector4Field(_rect, "Values at 1", _vector1.vector4Value);
-            if (EditorGUI.EndChangeCheck()) _vector1.vector4Value = v1;
-
-            MoveRectToNextLine();
-            MoveRectToNextLineInNarrowMode();
         }
 
         #endregion
@@ -93,15 +105,16 @@ namespace Klak.Timeline
             EditorGUI.indentLevel++;
 
             // Component selection drop-down
-            var i0 = System.Array.IndexOf(_componentNames, TargetComponent.GetType().Name);
-            var i1 = EditorGUI.Popup(_rect, "Component", Mathf.Max(0, i0), _componentNames);
-            MoveRectToNextLine();
+            EditorGUI.BeginChangeCheck();
 
-            // Update the target on a selection change.
-            if (i0 != i1)
+            var index = System.Array.IndexOf(_componentNames, TargetComponent.GetType().Name);
+            index = EditorGUI.Popup(_rect, "Component", index, _componentNames);
+
+            if (EditorGUI.EndChangeCheck())
                 _targetComponent.exposedReferenceValue =
-                    TargetComponent.gameObject.GetComponent(_componentNames[i1]);
+                    TargetComponent.gameObject.GetComponent(_componentNames[index]);
 
+            MoveRectToNextLine();
             EditorGUI.indentLevel--;
         }
 
@@ -119,30 +132,50 @@ namespace Klak.Timeline
             else
             {
                 // Property selection drop-down
-                var i0 = System.Array.IndexOf(_propertyNames, _propertyName.stringValue);
-                var i1 = EditorGUI.Popup(_rect, "Property", Mathf.Max(i0, 0), _propertyLabels);
-                MoveRectToNextLine();
+                EditorGUI.BeginChangeCheck();
 
-                // Update the target on selection changes.
-                if (i0 != i1)
+                var index = System.Array.IndexOf(_propertyNames, _propertyName.stringValue);
+                index = EditorGUI.Popup(_rect, "Property", index, _propertyLabels);
+
+                if (EditorGUI.EndChangeCheck())
                 {
-                    _propertyName.stringValue = _propertyNames[i1];
-                    _fieldName.stringValue = _fieldNames[i1];
+                    _propertyName.stringValue = _propertyNames[index];
+                    _fieldName.stringValue = _fieldNames[index];
                 }
+
+                MoveRectToNextLine();
             }
         }
 
+        #endregion
+
+        #region Property option drawer
+
         public void DrawPropertyOptions()
         {
-            if (_propertyTypes.Length == 0) return;
-
             var pidx = System.Array.IndexOf(_propertyNames, _propertyName.stringValue);
-            var type = _propertyTypes[pidx];
+            var type = pidx < 0 ? null : (SerializedPropertyType?)_propertyTypes[pidx];
 
             var v0 = _vector0.vector4Value;
             var v1 = _vector1.vector4Value;
 
-            if (type == SerializedPropertyType.Float)
+            if (type == null)
+            {
+                EditorGUI.BeginChangeCheck();
+                v0 = EditorGUI.Vector4Field(_rect, "Values at 0", v0);
+                if (EditorGUI.EndChangeCheck()) _vector0.vector4Value = v0;
+
+                MoveRectToNextLine();
+                MoveRectToNextLineInNarrowMode();
+
+                EditorGUI.BeginChangeCheck();
+                v1 = EditorGUI.Vector4Field(_rect, "Values at 1", v1);
+                if (EditorGUI.EndChangeCheck()) _vector1.vector4Value = v1;
+
+                MoveRectToNextLine();
+                MoveRectToNextLineInNarrowMode();
+            }
+            else if (type == SerializedPropertyType.Float)
             {
                 EditorGUI.BeginChangeCheck();
                 v0.x = EditorGUI.FloatField(_rect, "Value at 0", v0.x);
@@ -210,11 +243,42 @@ namespace Klak.Timeline
 
         #endregion
 
+        #region UI resources
+
+        static readonly GUIContent _labelTarget = new GUIContent("Target");
+        static readonly GUIContent _labelNote = new GUIContent("Note");
+        static readonly GUIContent _labelOctave = new GUIContent("Octave");
+        static readonly GUIContent _labelNoteOctave = new GUIContent("Note/Octave");
+
+        static readonly int [] _octaveValues = { -1, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 };
+
+        static readonly GUIContent [] _octaveLabels = {
+            new GUIContent("All"),
+            new GUIContent("-2"), new GUIContent("-1"), new GUIContent("0"),
+            new GUIContent( "1"), new GUIContent( "2"), new GUIContent("3"),
+            new GUIContent( "4"), new GUIContent( "5"), new GUIContent("6"),
+            new GUIContent( "7"), new GUIContent( "8")
+        };
+
+        static readonly int [] _noteValues = { -1, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11 };
+
+        static readonly GUIContent [] _noteLabels = {
+            new GUIContent("All"),
+            new GUIContent("C" ), new GUIContent("C#"), new GUIContent("D" ),
+            new GUIContent("D#"), new GUIContent("E" ), new GUIContent("F" ),
+            new GUIContent("F#"), new GUIContent("G" ), new GUIContent("G#"),
+            new GUIContent("A" ), new GUIContent("A#"), new GUIContent("B" )
+        };
+
+        #endregion
+
         #region Private members
 
         SerializedProperty _controlNumber;
-        SerializedProperty _targetComponent;
+        SerializedProperty _octave;
+        SerializedProperty _noteNumber;
 
+        SerializedProperty _targetComponent;
         SerializedProperty _propertyName;
         SerializedProperty _fieldName;
 
@@ -226,14 +290,11 @@ namespace Klak.Timeline
         GameObject _cachedGameObject;
 
         // Used in property selection drop-down
-        string [] _propertyNames;
+        string [] _propertyNames = new string [0];
         string [] _propertyLabels;
         string [] _fieldNames;
         SerializedPropertyType [] _propertyTypes;
         System.Type _cachedComponentType;
-
-        // Labels
-        static readonly GUIContent _labelTarget = new GUIContent("Target");
 
         Rect _rect;
 
@@ -351,14 +412,14 @@ namespace Klak.Timeline
             if (drawer.TargetComponent == null)
             {
                 drawer.DrawPropertyField();
-                drawer.DrawPropertyVectorFields();
             }
             else
             {
                 drawer.DrawComponentSelector();
                 drawer.DrawPropertySelector();
-                drawer.DrawPropertyOptions();
             }
+
+            drawer.DrawPropertyOptions();
         }
 
         public override float GetPropertyHeight(SerializedProperty property, GUIContent label)

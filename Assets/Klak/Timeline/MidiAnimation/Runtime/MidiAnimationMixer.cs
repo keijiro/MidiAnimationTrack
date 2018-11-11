@@ -9,6 +9,7 @@ namespace Klak.Timeline
     {
         #region Serialized variables
 
+        public MidiControlMode controlMode = MidiControlMode.ControlChange;
         public MidiControl [] controls = new MidiControl [0];
 
         #endregion

@@ -18,16 +18,16 @@ namespace Klak.Timeline
         {
             _controlNumber = property.FindPropertyRelative("controlNumber");
 
-            _componentName = property.FindPropertyRelative("componentName");
-            _propertyName  = property.FindPropertyRelative("propertyName");
-            _fieldName     = property.FindPropertyRelative("fieldName");
+            _targetComponent = property.FindPropertyRelative("targetComponent");
+            _propertyName    = property.FindPropertyRelative("propertyName");
+            _fieldName       = property.FindPropertyRelative("fieldName");
 
-            _vector0       = property.FindPropertyRelative("vector0");
-            _vector1       = property.FindPropertyRelative("vector1");
+            _vector0 = property.FindPropertyRelative("vector0");
+            _vector1 = property.FindPropertyRelative("vector1");
         }
 
-        public string ComponentName {
-            get { return _componentName?.stringValue; }
+        public Component TargetComponent {
+            get { return (Component)(_targetComponent.exposedReferenceValue); }
         }
 
         public void SetRect(Rect rect)
@@ -41,9 +41,9 @@ namespace Klak.Timeline
         public float CalculateHeight()
         {
             if (EditorGUIUtility.wideMode)
-                return EditorGUIUtility.singleLineHeight * 5 + 2 * 4;
+                return EditorGUIUtility.singleLineHeight * 6 + 2 * 5;
             else
-                return EditorGUIUtility.singleLineHeight * 7 + 2 * 4;
+                return EditorGUIUtility.singleLineHeight * 8 + 2 * 5;
         }
 
         #endregion
@@ -54,11 +54,8 @@ namespace Klak.Timeline
         {
             EditorGUI.PropertyField(_rect, _controlNumber);
             MoveRectToNextLine();
-        }
 
-        public void DrawComponentField()
-        {
-            EditorGUI.PropertyField(_rect, _componentName);
+            EditorGUI.PropertyField(_rect, _targetComponent, _labelTarget);
             MoveRectToNextLine();
         }
 
@@ -89,25 +86,28 @@ namespace Klak.Timeline
 
         #region Detailed UI methods for online editing
 
-        public void DrawComponentSelector(GameObject go)
+        public void DrawComponentSelector()
         {
-            CacheComponentsInGameObject(go);
+            CacheSiblingComponents();
+
+            EditorGUI.indentLevel++;
 
             // Component selection drop-down
-            var name = _componentName.stringValue;
-            var index0 = System.Array.IndexOf(_componentNames, name);
-            var index1 = EditorGUI.Popup
-                (_rect, "Component", Mathf.Max(0, index0), _componentNames);
+            var i0 = System.Array.IndexOf(_componentNames, TargetComponent.GetType().Name);
+            var i1 = EditorGUI.Popup(_rect, "Component", Mathf.Max(0, i0), _componentNames);
             MoveRectToNextLine();
 
             // Update the target on a selection change.
-            if (index0 != index1)
-                _componentName.stringValue = _componentNames[index1];
+            if (i0 != i1)
+                _targetComponent.exposedReferenceValue =
+                    TargetComponent.gameObject.GetComponent(_componentNames[i1]);
+
+            EditorGUI.indentLevel--;
         }
 
-        public void DrawPropertySelector(Component component)
+        public void DrawPropertySelector()
         {
-            CachePropertiesInComponent(component);
+            CachePropertiesInTargetComponent();
 
             if (_propertyNames.Length == 0)
             {
@@ -119,17 +119,15 @@ namespace Klak.Timeline
             else
             {
                 // Property selection drop-down
-                var name = _propertyName.stringValue;
-                var index0 = System.Array.IndexOf(_propertyNames, name);
-                var index1 = EditorGUI.Popup
-                    (_rect, "Property", Mathf.Max(index0, 0), _propertyLabels);
+                var i0 = System.Array.IndexOf(_propertyNames, _propertyName.stringValue);
+                var i1 = EditorGUI.Popup(_rect, "Property", Mathf.Max(i0, 0), _propertyLabels);
                 MoveRectToNextLine();
 
                 // Update the target on selection changes.
-                if (index0 != index1)
+                if (i0 != i1)
                 {
-                    _propertyName.stringValue = _propertyNames[index1];
-                    _fieldName.stringValue = _fieldNames[index1];
+                    _propertyName.stringValue = _propertyNames[i1];
+                    _fieldName.stringValue = _fieldNames[i1];
                 }
             }
         }
@@ -214,25 +212,28 @@ namespace Klak.Timeline
 
         #region Private members
 
-        public SerializedProperty _controlNumber;
+        SerializedProperty _controlNumber;
+        SerializedProperty _targetComponent;
 
-        public SerializedProperty _componentName;
-        public SerializedProperty _propertyName;
-        public SerializedProperty _fieldName;
+        SerializedProperty _propertyName;
+        SerializedProperty _fieldName;
 
-        public SerializedProperty _vector0;
-        public SerializedProperty _vector1;
+        SerializedProperty _vector0;
+        SerializedProperty _vector1;
 
         // Used in component selection drop-down
-        public string [] _componentNames;
-        public GameObject _cachedGameObject;
+        string [] _componentNames;
+        GameObject _cachedGameObject;
 
         // Used in property selection drop-down
-        public string [] _propertyNames;
-        public string [] _propertyLabels;
-        public string [] _fieldNames;
-        public SerializedPropertyType [] _propertyTypes;
-        public System.Type _cachedComponentType;
+        string [] _propertyNames;
+        string [] _propertyLabels;
+        string [] _fieldNames;
+        SerializedPropertyType [] _propertyTypes;
+        System.Type _cachedComponentType;
+
+        // Labels
+        static readonly GUIContent _labelTarget = new GUIContent("Target");
 
         Rect _rect;
 
@@ -247,9 +248,11 @@ namespace Klak.Timeline
                 _rect.y += EditorGUIUtility.singleLineHeight;
         }
 
-        // Enumerate components attached to a given game object.
-        void CacheComponentsInGameObject(GameObject go)
+        // Enumerate components in the same game object that the target
+        // component is attached to.
+        void CacheSiblingComponents()
         {
+            var go = TargetComponent.gameObject;
             if (_cachedGameObject == go) return;
 
             _componentNames = go.GetComponents<Component>().
@@ -258,15 +261,13 @@ namespace Klak.Timeline
             _cachedGameObject = go;
         }
 
-        // Enumerate component properties that have corresponding serialized
-        // fields.
-        void CachePropertiesInComponent(Component component)
+        // Enumerate properties in the target component.
+        void CachePropertiesInTargetComponent()
         {
-            var componentType = component.GetType();
-
+            var componentType = TargetComponent.GetType();
             if (_cachedComponentType == componentType) return;
 
-            var itr = (new SerializedObject(component)).GetIterator();
+            var itr = (new SerializedObject(TargetComponent)).GetIterator();
 
             var pnames = new List<string>();
             var labels = new List<string>();
@@ -345,32 +346,17 @@ namespace Klak.Timeline
             var drawer = GetCachedDrawer(property);
 
             drawer.SetRect(rect);
-
-            // Common settings
             drawer.DrawCommonSettings();
 
-            // Track-bound game object
-            var target = (TrackAsset)property.serializedObject.targetObject;
-            var go = TimelineEditor.inspectedDirector?.GetGenericBinding(target) as GameObject;
-
-            // Component selector
-            if (go == null)
-                drawer.DrawComponentField();
-            else
-                drawer.DrawComponentSelector(go);
-
-            // Selected component
-            var component = go?.GetComponent(drawer.ComponentName);
-
-            // Property selector and options
-            if (component == null)
+            if (drawer.TargetComponent == null)
             {
                 drawer.DrawPropertyField();
                 drawer.DrawPropertyVectorFields();
             }
             else
             {
-                drawer.DrawPropertySelector(component);
+                drawer.DrawComponentSelector();
+                drawer.DrawPropertySelector();
                 drawer.DrawPropertyOptions();
             }
         }

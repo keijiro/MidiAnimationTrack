@@ -20,6 +20,8 @@ namespace Klak.Timeline
             var target = playerData as GameObject;
             if (target == null) return;
 
+            var resolver = playable.GetGraph().GetResolver();
+
             foreach (var ctrl in controls)
             {
                 var acc = 0.0f;
@@ -31,7 +33,7 @@ namespace Klak.Timeline
                     acc += playable.GetInputWeight(i) * value;
                 }
 
-                var component = target.GetComponent(ctrl.componentName);
+                var component = ctrl.targetComponent.Resolve(resolver);
                 if (component == null) continue;
 
                 var prop = component.GetType().GetProperty(ctrl.propertyName);

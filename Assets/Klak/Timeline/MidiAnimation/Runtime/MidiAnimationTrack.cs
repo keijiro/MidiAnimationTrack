@@ -6,7 +6,6 @@ namespace Klak.Timeline
 {
     [TrackColor(0.4f, 0.4f, 0.4f)]
     [TrackClipType(typeof(MidiAnimationAsset))]
-    [TrackBindingType(typeof(GameObject))]
     public class MidiAnimationTrack : TrackAsset
     {
         #region Serialized object
@@ -28,20 +27,16 @@ namespace Klak.Timeline
 
         public override void GatherProperties(PlayableDirector director, IPropertyCollector driver)
         {
-            var go = director.GetGenericBinding(this) as GameObject;
-            if (go == null) return;
-
             if (template.controls == null) return;
 
             foreach (var ctrl in template.controls)
             {
-                if (string.IsNullOrEmpty(ctrl.componentName)) continue;
-                if (string.IsNullOrEmpty(ctrl.fieldName)) continue;
-                    
-                var component = go.GetComponent(ctrl.componentName);
+                var component = ctrl.targetComponent.Resolve(director);
                 if (component == null) continue;
 
-                driver.AddFromName(component.GetType(), go, ctrl.fieldName);
+                if (string.IsNullOrEmpty(ctrl.fieldName)) continue;
+
+                driver.AddFromName(component.GetType(), component.gameObject, ctrl.fieldName);
             }
         }
 

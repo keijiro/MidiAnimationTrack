@@ -112,14 +112,18 @@ MonoBehaviour:
   template:
     controls:
     - controlNumber: 1
-      componentName: Transform
+      targetComponent:
+        exposedName: e462ff9e94d4b554e97f01e774f554e6
+        defaultValue: {fileID: 0}
+      propertyName: intensity
+      fieldName: m_Intensity
+      vector0: {x: 0, y: 0, z: 0, w: 0}
+      vector1: {x: 2, y: 2, z: 0, w: 0}
+    - controlNumber: 1
+      targetComponent:
+        exposedName: a91a9cbdc8b96d342accea99186521f3
+        defaultValue: {fileID: 0}
       propertyName: localPosition
       fieldName: m_LocalPosition
       vector0: {x: 0, y: 0, z: 0, w: 0}
       vector1: {x: 0, y: 2, z: 0, w: 0}
-    - controlNumber: 2
-      componentName: Transform
-      propertyName: localRotation
-      fieldName: m_LocalRotation
-      vector0: {x: 0, y: 0, z: 0, w: 0}
-      vector1: {x: 0, y: 180, z: 0, w: 0}

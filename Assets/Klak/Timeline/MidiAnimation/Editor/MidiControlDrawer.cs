@@ -45,9 +45,9 @@ namespace Klak.Timeline
         public float CalculateHeight()
         {
             if (EditorGUIUtility.wideMode)
-                return EditorGUIUtility.singleLineHeight * 7 + 2 * 6;
+                return EditorGUIUtility.singleLineHeight * 7 + 2 * 6 + 40;
             else
-                return EditorGUIUtility.singleLineHeight * 10 + 2 * 6;
+                return EditorGUIUtility.singleLineHeight * 10 + 2 * 6 + 40;
         }
 
         #endregion
@@ -67,9 +67,10 @@ namespace Klak.Timeline
                 EditorGUI.PropertyField(_rect, _noteFilter, _labelNoteOctave);
                 MoveRectToNextLine();
 
-                EditorGUI.PropertyField(_rect, _envelope);
-                MoveRectToNextLine();
-                MoveRectToNextLineInNarrowMode();
+                var r = _rect;
+                r.height = MidiEnvelopeDrawer.GetHeight();
+                EditorGUI.PropertyField(r, _envelope);
+                _rect.y += r.height;
             }
 
             EditorGUI.PropertyField(_rect, _targetComponent, _labelTarget);

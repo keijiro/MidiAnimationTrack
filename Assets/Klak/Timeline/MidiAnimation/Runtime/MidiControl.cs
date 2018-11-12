@@ -2,6 +2,8 @@ using UnityEngine;
 
 namespace Klak.Timeline
 {
+    #region Control parameter types
+
     public enum MidiControlMode { ControlChange, MonoNote }
 
     public enum MidiNote {
@@ -22,29 +24,42 @@ namespace Klak.Timeline
     [System.Serializable]
     public struct MidiEnvelope
     {
+        // ADSR parameters
         public float attack;
         public float decay;
         public float sustain;
         public float release;
+
+        // Times in seconds
+        public float AttackTime  { get { return Mathf.Max(1e-5f, attack  / 10); } }
+        public float DecayTime   { get { return Mathf.Max(1e-5f, decay   / 10); } }
+        public float ReleaseTime { get { return Mathf.Max(1e-5f, release / 10); } }
+
+        // Normalized sustain level value
+        public float SustainLevel { get { return Mathf.Clamp01(sustain); } }
     }
+
+    #endregion
+
+    #region Serializable MIDI control class
 
     [System.Serializable]
     public class MidiControl
     {
-        // CC mode
+        // CC mode parameter
         public int controlNumber = 1;
 
-        // Mono note mode
+        // Mono note mode parameters
         public MidiNoteFilter noteFilter = new MidiNoteFilter {
             note = MidiNote.All, octave = MidiOctave.All
         };
 
-        // Envelope
+        // Envelope parameters
         public MidiEnvelope envelope = new MidiEnvelope {
-            attack = 1, decay = 1, sustain = 1, release = 0
+            attack = 0, decay = 0.2f, sustain = 1, release = 0
         };
 
-        // Component/property
+        // Component/property options
         public ExposedReference<Component> targetComponent;
         public string propertyName;
         public string fieldName;
@@ -53,4 +68,6 @@ namespace Klak.Timeline
         public Vector4 vector0 = Vector3.zero;
         public Vector4 vector1 = Vector3.forward;
     }
+
+    #endregion
 }

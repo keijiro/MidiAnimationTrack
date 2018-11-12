@@ -102,13 +102,13 @@ namespace Klak.Timeline
 
         float CalculateEnvelope(MidiEnvelope envelope, float onTime, float offTime)
         {
-            var attackRate = Mathf.Exp(envelope.attack);
-            var attackTime = 1 / attackRate;
+            var attackTime = envelope.AttackTime;
+            var attackRate = 1 / attackTime;
 
-            var decayRate = Mathf.Exp(envelope.decay);
-            var decayTime = 1 / decayRate;
+            var decayTime = envelope.DecayTime;
+            var decayRate = 1 / decayTime;
 
-            var level = -Mathf.Exp(envelope.release) * offTime;
+            var level = -offTime / envelope.ReleaseTime;
 
             if (onTime < attackTime)
             {
@@ -116,11 +116,11 @@ namespace Klak.Timeline
             }
             else if (onTime < attackTime + decayTime)
             {
-                level += 1 - (onTime - attackTime) * decayRate * (1 - envelope.sustain);
+                level += 1 - (onTime - attackTime) * decayRate * (1 - envelope.SustainLevel);
             }
             else
             {
-                level += envelope.sustain;
+                level += envelope.SustainLevel;
             }
 
             return Mathf.Max(0, level);

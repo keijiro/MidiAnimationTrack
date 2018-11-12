@@ -19,6 +19,7 @@ namespace Klak.Timeline
             _controlNumber = property.FindPropertyRelative("controlNumber");
             _octave        = property.FindPropertyRelative("octave");
             _noteNumber    = property.FindPropertyRelative("noteNumber");
+            _envelope      = property.FindPropertyRelative("envelope");
 
             _targetComponent = property.FindPropertyRelative("targetComponent");
             _propertyName    = property.FindPropertyRelative("propertyName");
@@ -45,9 +46,9 @@ namespace Klak.Timeline
         public float CalculateHeight()
         {
             if (EditorGUIUtility.wideMode)
-                return EditorGUIUtility.singleLineHeight * 6 + 2 * 5;
+                return EditorGUIUtility.singleLineHeight * 7 + 2 * 6;
             else
-                return EditorGUIUtility.singleLineHeight * 8 + 2 * 5;
+                return EditorGUIUtility.singleLineHeight * 10 + 2 * 6;
         }
 
         #endregion
@@ -82,6 +83,13 @@ namespace Klak.Timeline
                 var octave = EditorGUI.IntPopup(r, _octave.intValue, _octaveLabels, _octaveValues);
                 if (EditorGUI.EndChangeCheck()) _octave.intValue = octave;
                 MoveRectToNextLine();
+
+                // Envelope fields (ADSR)
+                var cur = _envelope.Copy();
+                cur.Next(true);
+                EditorGUI.MultiPropertyField(_rect, _adsrLabels, cur, _labelEnvelope);
+                MoveRectToNextLine();
+                MoveRectToNextLineInNarrowMode();
             }
 
             EditorGUI.PropertyField(_rect, _targetComponent, _labelTarget);
@@ -249,6 +257,7 @@ namespace Klak.Timeline
         static readonly GUIContent _labelNote = new GUIContent("Note");
         static readonly GUIContent _labelOctave = new GUIContent("Octave");
         static readonly GUIContent _labelNoteOctave = new GUIContent("Note/Octave");
+        static readonly GUIContent _labelEnvelope = new GUIContent("Envelope");
 
         static readonly int [] _octaveValues = { -1, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 };
 
@@ -270,6 +279,10 @@ namespace Klak.Timeline
             new GUIContent("A" ), new GUIContent("A#"), new GUIContent("B" )
         };
 
+        static readonly GUIContent [] _adsrLabels = {
+            new GUIContent("A"), new GUIContent("D"), new GUIContent("S"), new GUIContent("R")
+        };
+
         #endregion
 
         #region Private members
@@ -277,6 +290,7 @@ namespace Klak.Timeline
         SerializedProperty _controlNumber;
         SerializedProperty _octave;
         SerializedProperty _noteNumber;
+        SerializedProperty _envelope;
 
         SerializedProperty _targetComponent;
         SerializedProperty _propertyName;

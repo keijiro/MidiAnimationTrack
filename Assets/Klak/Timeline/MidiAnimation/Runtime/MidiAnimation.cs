@@ -100,15 +100,15 @@ namespace Klak.Timeline
 
         #region Envelope generator
 
-        float CalculateEnvelope(ref MidiControl ctrl, float onTime, float offTime)
+        float CalculateEnvelope(Vector4 envelope, float onTime, float offTime)
         {
-            var attackRate = Mathf.Exp(ctrl.attack);
+            var attackRate = Mathf.Exp(envelope.x);
             var attackTime = 1 / attackRate;
 
-            var decayRate = Mathf.Exp(ctrl.decay);
+            var decayRate = Mathf.Exp(envelope.y);
             var decayTime = 1 / decayRate;
 
-            var level = -Mathf.Exp(ctrl.release) * offTime;
+            var level = -Mathf.Exp(envelope.w) * offTime;
 
             if (onTime < attackTime)
             {
@@ -116,11 +116,11 @@ namespace Klak.Timeline
             }
             else if (onTime < attackTime + decayTime)
             {
-                level += 1 - (onTime - attackTime) * decayRate * (1 - ctrl.sustain);
+                level += 1 - (onTime - attackTime) * decayRate * (1 - envelope.z);
             }
             else
             {
-                level += ctrl.sustain;
+                level += envelope.z;
             }
 
             return Mathf.Max(0, level);
@@ -168,7 +168,7 @@ namespace Klak.Timeline
 
             var velocity = eOn.data2 / 127.0f;
 
-            return CalculateEnvelope(ref control, Mathf.Max(0, offTime - onTime), Mathf.Max(0, time - offTime)) * velocity;
+            return CalculateEnvelope(control.envelope, Mathf.Max(0, offTime - onTime), Mathf.Max(0, time - offTime)) * velocity;
         }
 
         #endregion

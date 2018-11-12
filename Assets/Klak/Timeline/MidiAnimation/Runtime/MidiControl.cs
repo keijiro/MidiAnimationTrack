@@ -13,10 +13,7 @@ namespace Klak.Timeline
         public int noteNumber = -1;
 
         // Envelope
-        public float attack = 1;
-        public float decay = 1;
-        public float sustain = 1;
-        public float release = 0;
+        public Vector4 envelope = new Vector4(1, 1, 1, 0);
 
         // Component/property
         public ExposedReference<Component> targetComponent;

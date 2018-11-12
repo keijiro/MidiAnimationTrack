@@ -25,9 +25,9 @@ namespace Klak.Timeline
         {
             var t = (float)playable.GetTime() % DurationInSecond;
             if (mode == MidiControlMode.ControlChange)
-                return GetCCValue(t, control.controlNumber);
+                return GetCCValue(control, t);
             else // MonoNote
-                return GetNoteValue(t, control.noteNumber, control.octave);
+                return GetNoteValue(control, t);
         }
 
         #endregion
@@ -76,17 +76,19 @@ namespace Klak.Timeline
             return (last, last);
         }
 
-        int GetNoteEventBeforeTick(uint tick, int note, int octave)
+        (int iOn, int iOff) GetNoteEventsBeforeTick(uint tick, int note, int octave)
         {
-            var last = -1;
+            var iOn = -1;
+            var iOff = -1;
             for (var i = 0; i < events.Length; i++)
             {
                 ref var e = ref events[i];
                 if (e.time > tick) break;
                 if ((e.status & 0xe0u) != 0x80u) continue;
-                if (IsNote(ref e, note, octave)) last = i;
+                if (!IsNote(ref e, note, octave)) continue;
+                if (IsNoteOn(ref e)) iOn = i; else iOff = i;
             }
-            return last;
+            return (iOn, iOff);
         }
 
         float ConvertTicksToSecond(uint tick)
@@ -96,12 +98,42 @@ namespace Klak.Timeline
 
         #endregion
 
+        #region Envelope generator
+
+        float CalculateEnvelope(ref MidiControl ctrl, float onTime, float offTime)
+        {
+            var attackRate = Mathf.Exp(ctrl.attack);
+            var attackTime = 1 / attackRate;
+
+            var decayRate = Mathf.Exp(ctrl.decay);
+            var decayTime = 1 / decayRate;
+
+            var level = -Mathf.Exp(ctrl.release) * offTime;
+
+            if (onTime < attackTime)
+            {
+                level += onTime * attackRate;
+            }
+            else if (onTime < attackTime + decayTime)
+            {
+                level += 1 - (onTime - attackTime) * decayRate * (1 - ctrl.sustain);
+            }
+            else
+            {
+                level += ctrl.sustain;
+            }
+
+            return Mathf.Max(0, level);
+        }
+
+        #endregion
+
         #region Value calculation methods
 
-        public float GetCCValue(float time, int controlNumber)
+        float GetCCValue(MidiControl control, float time)
         {
             var tick = (uint)(tempo * time / 60 * ticksPerQuarterNote);
-            var pair = GetCCEventIndexAroundTick(tick, controlNumber);
+            var pair = GetCCEventIndexAroundTick(tick, control.controlNumber);
 
             if (pair.i0 < 0) return 0;
             if (pair.i1 < 0) return events[pair.i0].data2 / 127.0f;
@@ -118,13 +150,25 @@ namespace Klak.Timeline
             return Mathf.Lerp(v0, v1, Mathf.Clamp01((time - t0) / (t1 - t0)));
         }
 
-        public float GetNoteValue(float time, int note, int octave)
+        float GetNoteValue(MidiControl control, float time)
         {
             var tick = (uint)(tempo * time / 60 * ticksPerQuarterNote);
-            var i = GetNoteEventBeforeTick(tick, note, octave);
-            if (i < 0) return 0;
-            ref var e = ref events[i];
-            return IsNoteOn(ref e) ? e.data2 / 127.0f : 0;
+            var pair = GetNoteEventsBeforeTick(tick, control.noteNumber, control.octave);
+
+            if (pair.iOn < 0) return 0;
+            ref var eOn = ref events[pair.iOn]; // Note-on event
+
+            // Note-on time
+            var onTime = ConvertTicksToSecond(eOn.time);
+
+            // Note-off time
+            var offTime =
+                pair.iOff < 0 || pair.iOff < pair.iOn ? time :
+                    ConvertTicksToSecond(events[pair.iOff].time);
+
+            var velocity = eOn.data2 / 127.0f;
+
+            return CalculateEnvelope(ref control, Mathf.Max(0, offTime - onTime), Mathf.Max(0, time - offTime)) * velocity;
         }
 
         #endregion

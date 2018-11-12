@@ -12,6 +12,12 @@ namespace Klak.Timeline
         public int octave = -1;
         public int noteNumber = -1;
 
+        // Envelope
+        public float attack = 1;
+        public float decay = 1;
+        public float sustain = 1;
+        public float release = 0;
+
         // Component/property
         public ExposedReference<Component> targetComponent;
         public string propertyName;

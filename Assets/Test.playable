@@ -113,32 +113,50 @@ MonoBehaviour:
     controlMode: 1
     controls:
     - controlNumber: 1
-      octave: -1
-      noteNumber: 0
+      noteFilter:
+        note: 1
+        octave: 0
+      envelope:
+        attack: 0
+        decay: 0.4
+        sustain: 0.2
+        release: 1
       targetComponent:
         exposedName: e462ff9e94d4b554e97f01e774f554e6
         defaultValue: {fileID: 0}
       propertyName: intensity
       fieldName: m_Intensity
       vector0: {x: 0, y: 0.07144785, z: 1, w: 0}
-      vector1: {x: 3, y: 2, z: 0, w: 0}
-    - controlNumber: 1
-      octave: -1
-      noteNumber: 4
-      targetComponent:
-        exposedName: a91a9cbdc8b96d342accea99186521f3
-        defaultValue: {fileID: 0}
-      propertyName: localPosition
-      fieldName: m_LocalPosition
-      vector0: {x: 0, y: 0, z: 0, w: 0}
-      vector1: {x: 0, y: 1, z: 0, w: 0}
+      vector1: {x: 10, y: 2, z: 0, w: 0}
     - controlNumber: 0
-      octave: -1
-      noteNumber: 5
+      noteFilter:
+        note: 5
+        octave: 0
+      envelope:
+        attack: 0
+        decay: 0.4
+        sustain: 0.2
+        release: 1
       targetComponent:
-        exposedName: 89a60603e8425ee4a839a8640a43b0e5
+        exposedName: 05889f2fcc41eb2428d4cd2f4e2ee8c7
         defaultValue: {fileID: 0}
-      propertyName: localRotation
-      fieldName: m_LocalRotation
+      propertyName: intensity
+      fieldName: m_Intensity
+      vector0: {x: 0, y: 0.5, z: 0.5, w: 0}
+      vector1: {x: 10, y: 1, z: 1, w: 0}
+    - controlNumber: 0
+      noteFilter:
+        note: 6
+        octave: 0
+      envelope:
+        attack: 0
+        decay: 1
+        sustain: 0
+        release: 1
+      targetComponent:
+        exposedName: 5f2568fb351900d46a9333efeb0acebe
+        defaultValue: {fileID: 0}
+      propertyName: intensity
+      fieldName: m_Intensity
       vector0: {x: 0, y: 0, z: 0, w: 0}
-      vector1: {x: 0, y: 45, z: 0, w: 0}
+      vector1: {x: 2, y: 0, z: 0, w: 0}

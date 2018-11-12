@@ -64,17 +64,19 @@ namespace Klak.Timeline
             // Position parameters
             var w2 = rect.width * 2;
             var h = rect.height;
-            var sus = (1 - env.SustainLevel) * h;
+            var offs = env.SustainLevel == 0 ? 1 : 0;
+            var sus = (1 - env.SustainLevel) * h + offs;
 
             // ADSR graph vertices
-            _vertices[0] = new Vector3(0, h);
-            _vertices[1] = new Vector3(w2 * t1, 0);
-            _vertices[2] = new Vector3(w2 * t2, sus);
+            _vertices[0] = new Vector3(1, h - 1);
+            _vertices[1] = new Vector3(w2 * t1 + 1, 1);
+            _vertices[2] = new Vector3(w2 * t2 + 1, sus);
             _vertices[3] = new Vector3(w2 * t3, sus);
-            _vertices[4] = new Vector3(w2 * t4, h);
+            _vertices[4] = new Vector3(w2 * t4, h - 1 + offs * 2);
 
             // Draw the graph with clipping
             GUI.BeginGroup(rect);
+            Handles.color = new Color(0.6f, 1, 0.3f);
             Handles.DrawAAPolyLine(_vertices);
             GUI.EndGroup();
         }

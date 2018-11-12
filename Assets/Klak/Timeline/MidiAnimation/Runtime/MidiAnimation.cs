@@ -39,17 +39,17 @@ namespace Klak.Timeline
             return ((e.status & 0xb0) == 0xb0) && e.data1 == ccNumber;
         }
 
-        static bool IsNote(ref MidiEvent e, int note, int octave)
+        static bool IsNote(ref MidiEvent e, MidiNoteFilter note)
         {
             if ((e.status & 0xe0) != 0x80) return false;
 
             var num = e.data1;
 
             // Octave test
-            if (octave >= 0 && num / 12 != octave) return false;
+            if (note.octave != MidiOctave.All && num / 12 != (int)note.octave - 1) return false;
 
             // Note (interval) test
-            if (note >= 0 && num % 12 != note) return false;
+            if (note.note != MidiNote.All && num % 12 != (int)note.note - 1) return false;
 
             return true;
         }
@@ -76,7 +76,7 @@ namespace Klak.Timeline
             return (last, last);
         }
 
-        (int iOn, int iOff) GetNoteEventsBeforeTick(uint tick, int note, int octave)
+        (int iOn, int iOff) GetNoteEventsBeforeTick(uint tick, MidiNoteFilter note)
         {
             var iOn = -1;
             var iOff = -1;
@@ -85,7 +85,7 @@ namespace Klak.Timeline
                 ref var e = ref events[i];
                 if (e.time > tick) break;
                 if ((e.status & 0xe0u) != 0x80u) continue;
-                if (!IsNote(ref e, note, octave)) continue;
+                if (!IsNote(ref e, note)) continue;
                 if (IsNoteOn(ref e)) iOn = i; else iOff = i;
             }
             return (iOn, iOff);
@@ -100,15 +100,15 @@ namespace Klak.Timeline
 
         #region Envelope generator
 
-        float CalculateEnvelope(Vector4 envelope, float onTime, float offTime)
+        float CalculateEnvelope(MidiEnvelope envelope, float onTime, float offTime)
         {
-            var attackRate = Mathf.Exp(envelope.x);
+            var attackRate = Mathf.Exp(envelope.attack);
             var attackTime = 1 / attackRate;
 
-            var decayRate = Mathf.Exp(envelope.y);
+            var decayRate = Mathf.Exp(envelope.decay);
             var decayTime = 1 / decayRate;
 
-            var level = -Mathf.Exp(envelope.w) * offTime;
+            var level = -Mathf.Exp(envelope.release) * offTime;
 
             if (onTime < attackTime)
             {
@@ -116,11 +116,11 @@ namespace Klak.Timeline
             }
             else if (onTime < attackTime + decayTime)
             {
-                level += 1 - (onTime - attackTime) * decayRate * (1 - envelope.z);
+                level += 1 - (onTime - attackTime) * decayRate * (1 - envelope.sustain);
             }
             else
             {
-                level += envelope.z;
+                level += envelope.sustain;
             }
 
             return Mathf.Max(0, level);
@@ -153,7 +153,7 @@ namespace Klak.Timeline
         float GetNoteValue(MidiControl control, float time)
         {
             var tick = (uint)(tempo * time / 60 * ticksPerQuarterNote);
-            var pair = GetNoteEventsBeforeTick(tick, control.noteNumber, control.octave);
+            var pair = GetNoteEventsBeforeTick(tick, control.noteFilter);
 
             if (pair.iOn < 0) return 0;
             ref var eOn = ref events[pair.iOn]; // Note-on event

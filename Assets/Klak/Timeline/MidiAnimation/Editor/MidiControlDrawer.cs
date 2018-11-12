@@ -17,8 +17,7 @@ namespace Klak.Timeline
         public MidiControlDrawer(SerializedProperty property)
         {
             _controlNumber = property.FindPropertyRelative("controlNumber");
-            _octave        = property.FindPropertyRelative("octave");
-            _noteNumber    = property.FindPropertyRelative("noteNumber");
+            _noteFilter    = property.FindPropertyRelative("noteFilter");
             _envelope      = property.FindPropertyRelative("envelope");
 
             _targetComponent = property.FindPropertyRelative("targetComponent");
@@ -65,29 +64,10 @@ namespace Klak.Timeline
             }
             else
             {
-                EditorGUI.PrefixLabel(_rect, _labelNoteOctave);
-
-                // Half width control rect
-                var r = _rect;
-                r.x += EditorGUIUtility.labelWidth;
-                r.width = (r.width - EditorGUIUtility.labelWidth - 4) / 2;
-
-                // Note name drop down
-                EditorGUI.BeginChangeCheck();
-                var note = EditorGUI.IntPopup(r, _noteNumber.intValue, _noteLabels, _noteValues);
-                if (EditorGUI.EndChangeCheck()) _noteNumber.intValue = note;
-                r.x += r.width + 4;
-
-                // Octave drop down
-                EditorGUI.BeginChangeCheck();
-                var octave = EditorGUI.IntPopup(r, _octave.intValue, _octaveLabels, _octaveValues);
-                if (EditorGUI.EndChangeCheck()) _octave.intValue = octave;
+                EditorGUI.PropertyField(_rect, _noteFilter, _labelNoteOctave);
                 MoveRectToNextLine();
 
-                // Envelope fields (ADSR)
-                var cur = _envelope.Copy();
-                cur.Next(true);
-                EditorGUI.MultiPropertyField(_rect, _adsrLabels, cur, _labelEnvelope);
+                EditorGUI.PropertyField(_rect, _envelope);
                 MoveRectToNextLine();
                 MoveRectToNextLineInNarrowMode();
             }
@@ -254,42 +234,14 @@ namespace Klak.Timeline
         #region UI resources
 
         static readonly GUIContent _labelTarget = new GUIContent("Target");
-        static readonly GUIContent _labelNote = new GUIContent("Note");
-        static readonly GUIContent _labelOctave = new GUIContent("Octave");
         static readonly GUIContent _labelNoteOctave = new GUIContent("Note/Octave");
-        static readonly GUIContent _labelEnvelope = new GUIContent("Envelope");
-
-        static readonly int [] _octaveValues = { -1, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 };
-
-        static readonly GUIContent [] _octaveLabels = {
-            new GUIContent("All"),
-            new GUIContent("-2"), new GUIContent("-1"), new GUIContent("0"),
-            new GUIContent( "1"), new GUIContent( "2"), new GUIContent("3"),
-            new GUIContent( "4"), new GUIContent( "5"), new GUIContent("6"),
-            new GUIContent( "7"), new GUIContent( "8")
-        };
-
-        static readonly int [] _noteValues = { -1, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11 };
-
-        static readonly GUIContent [] _noteLabels = {
-            new GUIContent("All"),
-            new GUIContent("C" ), new GUIContent("C#"), new GUIContent("D" ),
-            new GUIContent("D#"), new GUIContent("E" ), new GUIContent("F" ),
-            new GUIContent("F#"), new GUIContent("G" ), new GUIContent("G#"),
-            new GUIContent("A" ), new GUIContent("A#"), new GUIContent("B" )
-        };
-
-        static readonly GUIContent [] _adsrLabels = {
-            new GUIContent("A"), new GUIContent("D"), new GUIContent("S"), new GUIContent("R")
-        };
 
         #endregion
 
         #region Private members
 
         SerializedProperty _controlNumber;
-        SerializedProperty _octave;
-        SerializedProperty _noteNumber;
+        SerializedProperty _noteFilter;
         SerializedProperty _envelope;
 
         SerializedProperty _targetComponent;

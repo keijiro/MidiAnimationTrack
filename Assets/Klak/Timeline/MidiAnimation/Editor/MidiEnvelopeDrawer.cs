@@ -66,10 +66,24 @@ namespace Klak.Timeline
 
         const float GraphHeight = 40;
 
-        static readonly Color backgroundColor = new Color(0.2f, 0.2f, 0.2f);
-        static readonly Color highlightColor = new Color(0.23f, 0.22f, 0.22f);
-        static readonly Color guideColor = new Color(0.3f, 0.3f, 0.3f);
-        static readonly Color LineColor = new Color(0.6f, 0.9f, 0.4f);
+        static Color backgroundColor { get {
+            return EditorGUIUtility.isProSkin ?
+                new Color(0.18f, 0.18f, 0.18f) : new Color(0.45f, 0.45f, 0.45f);
+        } }
+        static Color highlightColor { get {
+            return EditorGUIUtility.isProSkin ?
+                new Color(0.25f, 0.25f, 0.25f) : new Color(0.5f, 0.5f, 0.5f);
+        } }
+
+        static Color guideColor { get {
+            return EditorGUIUtility.isProSkin ?
+                new Color(0.3f, 0.3f, 0.3f) : new Color(0.56f, 0.56f, 0.56f);
+        } }
+
+        static Color LineColor { get {
+            return EditorGUIUtility.isProSkin ?
+                new Color(0.6f, 0.9f, 0.4f) : new Color(0.4f, 0.9f, 0.2f);
+        } }
 
         static readonly GUIContent [] _adsrLabels = {
             new GUIContent("A"), new GUIContent("D"),

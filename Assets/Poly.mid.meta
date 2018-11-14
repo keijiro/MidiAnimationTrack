@@ -1,0 +1,12 @@
+fileFormatVersion: 2
+guid: dd9933b34652565409bcae6ba976e101
+ScriptedImporter:
+  fileIDToRecycleName:
+    11400000: MidiFileAsset
+    11400002: Poly Track 1
+  externalObjects: {}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+  script: {fileID: 11500000, guid: 6782f17a22ce146e887bd8530aa7cadc, type: 3}
+  _tempo: 120

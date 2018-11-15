@@ -42,8 +42,8 @@ MonoBehaviour:
   m_Clips:
   - m_Start: 0
     m_ClipIn: 0
-    m_Asset: {fileID: 11400002, guid: dd9933b34652565409bcae6ba976e101, type: 3}
-    m_Duration: 4
+    m_Asset: {fileID: 11400002, guid: e8314f03e24681b478de61ef5814f5d0, type: 3}
+    m_Duration: 6.857142925262451
     m_TimeScale: 1
     m_ParentTrack: {fileID: 114010881152227116}
     m_EaseInDuration: 0
@@ -107,7 +107,7 @@ MonoBehaviour:
     m_PreExtrapolationMode: 0
     m_PostExtrapolationTime: Infinity
     m_PreExtrapolationTime: 0
-    m_DisplayName: Poly Track 1
+    m_DisplayName: Drums Track 1
     m_Version: 1
   m_Version: 2
   template:
@@ -115,23 +115,39 @@ MonoBehaviour:
     controls:
     - controlNumber: 1
       noteFilter:
-        note: 10
+        note: 1
         octave: 0
       envelope:
         attack: 0
-        decay: 2
+        decay: 3
         sustain: 0
-        release: 2
+        release: 3
       targetComponent:
         exposedName: e462ff9e94d4b554e97f01e774f554e6
         defaultValue: {fileID: 0}
       propertyName: intensity
       fieldName: m_Intensity
       vector0: {x: 0, y: 0.07144785, z: 1, w: 0}
-      vector1: {x: 14, y: 2, z: 0, w: 0}
+      vector1: {x: 10, y: 2, z: 0, w: 0}
     - controlNumber: 0
       noteFilter:
-        note: 8
+        note: 3
+        octave: 0
+      envelope:
+        attack: 0
+        decay: 4
+        sustain: 0
+        release: 4
+      targetComponent:
+        exposedName: 05889f2fcc41eb2428d4cd2f4e2ee8c7
+        defaultValue: {fileID: 0}
+      propertyName: intensity
+      fieldName: m_Intensity
+      vector0: {x: 0, y: 0.5, z: 0.5, w: 0}
+      vector1: {x: 10, y: 1, z: 1, w: 0}
+    - controlNumber: 0
+      noteFilter:
+        note: 5
         octave: 0
       envelope:
         attack: 0
@@ -139,43 +155,12 @@ MonoBehaviour:
         sustain: 0
         release: 2
       targetComponent:
-        exposedName: 05889f2fcc41eb2428d4cd2f4e2ee8c7
-        defaultValue: {fileID: 0}
-      propertyName: intensity
-      fieldName: m_Intensity
-      vector0: {x: 0, y: 0.5, z: 0.5, w: 0}
-      vector1: {x: 14, y: 1, z: 1, w: 0}
-    - controlNumber: 0
-      noteFilter:
-        note: 0
-        octave: 0
-      envelope:
-        attack: 0
-        decay: 1
-        sustain: 0
-        release: 1
-      targetComponent:
-        exposedName: 5f2568fb351900d46a9333efeb0acebe
+        exposedName: 96132e20402afb541a0e08d0483f942e
         defaultValue: {fileID: 0}
       propertyName: intensity
       fieldName: m_Intensity
       vector0: {x: 0, y: 0, z: 0, w: 0}
-      vector1: {x: 3, y: 0, z: 0, w: 0}
---- !u!114 &114220572893579732
-MonoBehaviour:
-  m_ObjectHideFlags: 1
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: -1977359656, guid: 6a10b2909283487f913b00d94cd3faf5, type: 3}
-  m_Name: AudioPlayableAsset
-  m_EditorClassIdentifier: 
-  m_Clip: {fileID: 8300000, guid: 2179b5c5e96f15b469fb492d2bb74e24, type: 3}
-  m_Loop: 0
-  m_bufferingTime: 0.1
+      vector1: {x: 10, y: 0, z: 0, w: 0}
 --- !u!114 &114458323630856580
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -197,8 +182,8 @@ MonoBehaviour:
   m_Clips:
   - m_Start: 0
     m_ClipIn: 0
-    m_Asset: {fileID: 114220572893579732}
-    m_Duration: 4
+    m_Asset: {fileID: 114928894276166498}
+    m_Duration: 6.857142857142857
     m_TimeScale: 1
     m_ParentTrack: {fileID: 114458323630856580}
     m_EaseInDuration: 0
@@ -262,6 +247,21 @@ MonoBehaviour:
     m_PreExtrapolationMode: 0
     m_PostExtrapolationTime: 0
     m_PreExtrapolationTime: 0
-    m_DisplayName: Poly
+    m_DisplayName: Drums
     m_Version: 1
   m_Version: 2
+--- !u!114 &114928894276166498
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: -1977359656, guid: 6a10b2909283487f913b00d94cd3faf5, type: 3}
+  m_Name: AudioPlayableAsset
+  m_EditorClassIdentifier: 
+  m_Clip: {fileID: 8300000, guid: a1e1882b2c6a5ba4893805a7e54824cc, type: 3}
+  m_Loop: 0
+  m_bufferingTime: 0.1

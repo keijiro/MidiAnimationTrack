@@ -1,0 +1,12 @@
+fileFormatVersion: 2
+guid: e8314f03e24681b478de61ef5814f5d0
+ScriptedImporter:
+  fileIDToRecycleName:
+    11400000: MidiFileAsset
+    11400002: Drums Track 1
+  externalObjects: {}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+  script: {fileID: 11500000, guid: 6782f17a22ce146e887bd8530aa7cadc, type: 3}
+  _tempo: 140

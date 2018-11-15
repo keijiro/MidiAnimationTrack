@@ -587,6 +587,7 @@ PlayableDirector:
     - 89a60603e8425ee4a839a8640a43b0e5: {fileID: 0}
     - a91a9cbdc8b96d342accea99186521f3: {fileID: 0}
     - e462ff9e94d4b554e97f01e774f554e6: {fileID: 279555456}
+    - 96132e20402afb541a0e08d0483f942e: {fileID: 850234856}
     - 05889f2fcc41eb2428d4cd2f4e2ee8c7: {fileID: 827084427}
 --- !u!4 &1317505920
 Transform:

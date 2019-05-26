@@ -5,6 +5,12 @@ using UnityEngine.Timeline;
 
 namespace Klak.Timeline
 {
+    //
+    // Extension methods for IPropertyCollector
+    //
+    // This class is used to invoke a generic method AddFromName<T> with a
+    // dynamic type.
+    //
     static class IPropertyCollectorExtension
     {
         static (Type type, MethodInfo method) _genericAddFromName;

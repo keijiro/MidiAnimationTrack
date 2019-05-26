@@ -36,6 +36,7 @@ namespace Klak.Timeline
 
                 if (string.IsNullOrEmpty(ctrl.fieldName)) continue;
 
+                // This extension method is implemented in IPropertyCollectorExtension.cs
                 driver.AddFromName(component.GetType(), component.gameObject, ctrl.fieldName);
             }
         }

@@ -162,13 +162,18 @@ namespace Klak.Timeline
             var onTime = ConvertTicksToSecond(eOn.time);
 
             // Note-off time
-            var offTime =
-                pair.iOff < 0 || pair.iOff < pair.iOn ? time :
-                    ConvertTicksToSecond(events[pair.iOff].time);
+            var offTime = pair.iOff < 0 || pair.iOff < pair.iOn ?
+                time : ConvertTicksToSecond(events[pair.iOff].time);
+
+            var envelope = CalculateEnvelope(
+                control.envelope,
+                Mathf.Max(0, offTime - onTime),
+                Mathf.Max(0, time - offTime)
+            );
 
             var velocity = eOn.data2 / 127.0f;
 
-            return CalculateEnvelope(control.envelope, Mathf.Max(0, offTime - onTime), Mathf.Max(0, time - offTime)) * velocity;
+            return envelope * velocity;
         }
 
         #endregion

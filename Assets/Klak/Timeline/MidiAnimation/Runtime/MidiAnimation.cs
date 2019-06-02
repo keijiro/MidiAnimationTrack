@@ -8,9 +8,9 @@ namespace Klak.Timeline
     {
         #region Serialized variables
 
-        public float tempo;
+        public float tempo = 120;
         public uint duration;
-        public uint ticksPerQuarterNote;
+        public uint ticksPerQuarterNote = 96;
         public MidiEvent [] events;
 
         #endregion
@@ -23,6 +23,7 @@ namespace Klak.Timeline
 
         public float GetValue(Playable playable, MidiControl control, MidiControlMode mode)
         {
+            if (events == null) return 0;
             var t = (float)playable.GetTime() % DurationInSecond;
             if (mode == MidiControlMode.ControlChange)
                 return GetCCValue(control, t);

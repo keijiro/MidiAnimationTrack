@@ -15,14 +15,17 @@ namespace Klak.Timeline
 
         #endregion
 
-        #region UnityEvent array
+        #region UnityAction array
 
-        class FloatEvent : UnityEvent<float> {}
-        class Vector3Event : UnityEvent<Vector3> {}
-        class QuaternionEvent : UnityEvent<Quaternion> {}
-        class ColorEvent : UnityEvent<Color> {}
+        struct ControlAction
+        {
+            public UnityAction<float> floatAction;
+            public UnityAction<Vector3> vector3Action;
+            public UnityAction<Quaternion> quaternionAction;
+            public UnityAction<Color> colorAction;
+        }
 
-        UnityEventBase[] _events;
+        ControlAction[] _actions;
 
         #endregion
 
@@ -36,7 +39,7 @@ namespace Klak.Timeline
 
         public override void OnPlayableCreate(Playable playable)
         {
-            _events = new UnityEventBase[controls.Length];
+            _actions = new ControlAction[controls.Length];
 
             var resolver = playable.GetGraph().GetResolver();
 
@@ -51,29 +54,13 @@ namespace Klak.Timeline
                 var type = target?.GetType().GetProperty(name)?.PropertyType;
 
                 if (type == typeof(float))
-                {
-                    var e = new FloatEvent();
-                    e.AddListener(GetPropertyGetter<float>(target, name));
-                    _events[i] = e;
-                }
+                    _actions[i].floatAction = GetPropertyGetter<float>(target, name);
                 else if (type == typeof(Vector3))
-                {
-                    var e = new Vector3Event();
-                    e.AddListener(GetPropertyGetter<Vector3>(target, name));
-                    _events[i] = e;
-                }
+                    _actions[i].vector3Action = GetPropertyGetter<Vector3>(target, name);
                 else if (type == typeof(Quaternion))
-                {
-                    var e = new QuaternionEvent();
-                    e.AddListener(GetPropertyGetter<Quaternion>(target, name));
-                    _events[i] = e;
-                }
+                    _actions[i].quaternionAction = GetPropertyGetter<Quaternion>(target, name);
                 else if (type == typeof(Color))
-                {
-                    var e = new ColorEvent();
-                    e.AddListener(GetPropertyGetter<Color>(target, name));
-                    _events[i] = e;
-                }
+                    _actions[i].colorAction = GetPropertyGetter<Color>(target, name);
             }
         }
 
@@ -82,7 +69,7 @@ namespace Klak.Timeline
             for (var ci = 0; ci < controls.Length; ci++)
             {
                 var ctrl = controls[ci];
-                var ev = _events[ci];
+                var act = _actions[ci];
 
                 // Controller value accumulation
                 var acc = 0.0f;
@@ -98,14 +85,14 @@ namespace Klak.Timeline
                 var vec = Vector4.Lerp(ctrl.vector0, ctrl.vector1, acc);
 
                 // Controller event invocation
-                if (ev is FloatEvent)
-                    ((FloatEvent)ev).Invoke(vec.x);
-                else if (ev is Vector3Event)
-                    ((Vector3Event)ev).Invoke((Vector3)vec);
-                else if (ev is QuaternionEvent)
-                    ((QuaternionEvent)ev).Invoke(Quaternion.Euler(vec));
-                else if (ev is ColorEvent)
-                    ((ColorEvent)ev).Invoke((Color)vec);
+                if (act.floatAction != null)
+                    act.floatAction(vec.x);
+                else if (act.vector3Action != null)
+                    act.vector3Action((Vector3)vec);
+                else if (act.quaternionAction != null)
+                    act.quaternionAction(Quaternion.Euler(vec));
+                else if (act.colorAction != null)
+                    act.colorAction((Color)vec);
             }
         }
 

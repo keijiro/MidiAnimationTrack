@@ -36,24 +36,20 @@ namespace Klak.Timeline
 
         public void SetRect(Rect rect)
         {
-            _rect = rect;
+            _baseRect = _rect = rect;
 
             // We only use single-line height controls.
             _rect.height = EditorGUIUtility.singleLineHeight;
         }
 
-        public float CalculateHeight()
+        public float GetTotalHeight()
         {
-            if (EditorGUIUtility.wideMode)
-                return EditorGUIUtility.singleLineHeight * 7 + 2 * 6 + 40;
-            else
-                return EditorGUIUtility.singleLineHeight * 10 + 2 * 6 + 40;
+            return _rect.y - _baseRect.y;
         }
 
         #endregion
 
         #region Simple UI methods for offline editing
-
 
         public void DrawCommonSettings()
         {
@@ -74,12 +70,6 @@ namespace Klak.Timeline
             }
 
             EditorGUI.PropertyField(_rect, _targetComponent, _labelTarget);
-            MoveRectToNextLine();
-        }
-
-        public void DrawPropertyField()
-        {
-            EditorGUI.PropertyField(_rect, _propertyName);
             MoveRectToNextLine();
         }
 
@@ -148,37 +138,19 @@ namespace Klak.Timeline
             var v0 = _vector0.vector4Value;
             var v1 = _vector1.vector4Value;
 
-            if (type == null)
-            {
-                EditorGUI.BeginChangeCheck();
-                v0 = EditorGUI.Vector4Field(_rect, "Values at 0", v0);
-                if (EditorGUI.EndChangeCheck()) _vector0.vector4Value = v0;
-
-                MoveRectToNextLine();
-                MoveRectToNextLineInNarrowMode();
-
-                EditorGUI.BeginChangeCheck();
-                v1 = EditorGUI.Vector4Field(_rect, "Values at 1", v1);
-                if (EditorGUI.EndChangeCheck()) _vector1.vector4Value = v1;
-
-                MoveRectToNextLine();
-                MoveRectToNextLineInNarrowMode();
-            }
-            else if (type == SerializedPropertyType.Float)
+            if (type == SerializedPropertyType.Float)
             {
                 EditorGUI.BeginChangeCheck();
                 v0.x = EditorGUI.FloatField(_rect, "Value at 0", v0.x);
                 if (EditorGUI.EndChangeCheck()) _vector0.vector4Value = v0;
 
                 MoveRectToNextLine();
-                MoveRectToNextLineInNarrowMode();
 
                 EditorGUI.BeginChangeCheck();
                 v1.x = EditorGUI.FloatField(_rect, "Value at 1", v1.x);
                 if (EditorGUI.EndChangeCheck()) _vector1.vector4Value = v1;
 
                 MoveRectToNextLine();
-                MoveRectToNextLineInNarrowMode();
             }
             else if (type == SerializedPropertyType.Vector3)
             {
@@ -219,14 +191,12 @@ namespace Klak.Timeline
                 if (EditorGUI.EndChangeCheck()) _vector0.vector4Value = v0;
 
                 MoveRectToNextLine();
-                MoveRectToNextLineInNarrowMode();
 
                 EditorGUI.BeginChangeCheck();
                 v1 = EditorGUI.ColorField(_rect, "Color at 1", v1);
                 if (EditorGUI.EndChangeCheck()) _vector1.vector4Value = v1;
 
                 MoveRectToNextLine();
-                MoveRectToNextLineInNarrowMode();
             }
         }
 
@@ -263,6 +233,7 @@ namespace Klak.Timeline
         SerializedPropertyType [] _propertyTypes;
         System.Type _cachedComponentType;
 
+        Rect _baseRect;
         Rect _rect;
 
         void MoveRectToNextLine()
@@ -347,7 +318,7 @@ namespace Klak.Timeline
     #region Custom property drawer class (works as entry points)
 
     [CustomPropertyDrawer(typeof(MidiControl), true)]
-    class MidiControlDrawerEntry : PropertyDrawer
+    sealed class MidiControlDrawerEntry : PropertyDrawer
     {
         Dictionary<string, MidiControlDrawer> _drawers = new Dictionary<string, MidiControlDrawer>();
 
@@ -376,22 +347,17 @@ namespace Klak.Timeline
             drawer.SetRect(rect);
             drawer.DrawCommonSettings();
 
-            if (drawer.TargetComponent == null)
-            {
-                drawer.DrawPropertyField();
-            }
-            else
+            if (drawer.TargetComponent != null)
             {
                 drawer.DrawComponentSelector();
                 drawer.DrawPropertySelector();
+                drawer.DrawPropertyOptions();
             }
-
-            drawer.DrawPropertyOptions();
         }
 
         public override float GetPropertyHeight(SerializedProperty property, GUIContent label)
         {
-            return GetCachedDrawer(property).CalculateHeight();
+            return GetCachedDrawer(property).GetTotalHeight();
         }
     }
 

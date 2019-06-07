@@ -20,36 +20,15 @@ namespace Klak.Timeline
 
         #region PropertyDrawer implementation
 
-        public override void
-            OnGUI(Rect rect, SerializedProperty prop, GUIContent label)
+        public override void OnGUI(Rect rect, SerializedProperty prop, GUIContent label)
         {
-            // Used to determine the control IDs
+            // Head control ID: Used to determine the control IDs.
             var id0 = GUIUtility.GetControlID(FocusType.Passive);
 
-            // A-D-S-R float fields
-            var itr = prop.Copy();
-            itr.Next(true);
-            EditorGUI.MultiPropertyField(rect, _adsrLabels, itr, label);
+            // Envelope parameters (ADSR)
+            rect = DrawEnvelopeParameterFields(rect, prop, label);
 
-            // Rect for graph area
-            rect.y += EditorGUIUtility.standardVerticalSpacing;
-            rect.height = GraphHeight;
-
-            if (EditorGUIUtility.wideMode)
-            {
-                rect.x += EditorGUIUtility.labelWidth;
-                rect.y += EditorGUIUtility.singleLineHeight;
-                rect.width -= EditorGUIUtility.labelWidth;
-            }
-            else
-            {
-                rect.y += EditorGUIUtility.singleLineHeight * 2;
-                EditorGUI.indentLevel++;
-                rect = EditorGUI.IndentedRect(rect);
-                EditorGUI.indentLevel--;
-            }
-
-            // Draw envelope graph
+            // Envelope graph
             GUI.BeginGroup(rect);
             DrawGraph(RetrieveEnvelope(prop), rect.width, rect.height, id0 + 2);
             GUI.EndGroup();
@@ -92,6 +71,68 @@ namespace Klak.Timeline
 
         static Vector3 [] _lineVerts = new Vector3 [2];
         static Vector3 [] _graphVerts = new Vector3 [6];
+
+        Rect DrawEnvelopeParameterFields(Rect rect, SerializedProperty prop, GUIContent label)
+        {
+            // Make a copy of the SerializedProperty to iterate fields.
+            var itr = prop.Copy();
+
+            // Label (non clickable)
+            rect.height = EditorGUIUtility.singleLineHeight;
+            EditorGUI.LabelField(rect, label);
+
+            if (EditorGUIUtility.wideMode)
+            {
+                // Wide mode: Add margin for the label.
+                rect.x += EditorGUIUtility.labelWidth;
+                rect.width -= EditorGUIUtility.labelWidth;
+            }
+            else
+            {
+                // Narrow mode: Move to the next line.
+                rect.y += rect.height;
+
+                // Indent the following controls.
+                EditorGUI.indentLevel++;
+                rect = EditorGUI.IndentedRect(rect);
+                EditorGUI.indentLevel--;
+            }
+
+            // Field rect
+            var r = rect;
+            r.width = (r.width - 6) / 4;
+
+            // Change the label width in the following fields.
+            var originalLabelWidth = EditorGUIUtility.labelWidth;
+            EditorGUIUtility.labelWidth = 12;
+
+            for (var i = 0; i < 4; i++)
+            {
+                itr.Next(true);
+
+                // Element field
+                EditorGUI.BeginChangeCheck();
+                EditorGUI.PropertyField(r, itr, _adsrLabels[i]);
+
+                // Apply the value constraint.
+                if (EditorGUI.EndChangeCheck())
+                    if (i == 2)
+                        itr.floatValue = Mathf.Clamp01(itr.floatValue); // S
+                    else
+                        itr.floatValue = Mathf.Max(0, itr.floatValue); // ADR
+
+                // Move to the next field.
+                r.x += r.width + 2;
+            }
+
+            // Recover the original label width.
+            EditorGUIUtility.labelWidth = originalLabelWidth;
+
+            // Calculate the graph position.
+            rect.y += rect.height + EditorGUIUtility.standardVerticalSpacing;
+            rect.height = GraphHeight;
+            return rect;
+        }
 
         // Retrieve serialized envelope parameters #not_very_efficient
         MidiEnvelope RetrieveEnvelope(SerializedProperty prop)

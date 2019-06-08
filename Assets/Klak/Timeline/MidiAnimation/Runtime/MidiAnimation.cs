@@ -25,10 +25,10 @@ namespace Klak.Timeline
         {
             if (events == null) return 0;
             var t = (float)playable.GetTime() % DurationInSecond;
-            if (mode == MidiControlMode.ControlChange)
-                return GetCCValue(control, t);
-            else // MonoNote
+            if (mode == MidiControlMode.Note)
                 return GetNoteValue(control, t);
+            else // CC
+                return GetCCValue(control, t);
         }
 
         #endregion

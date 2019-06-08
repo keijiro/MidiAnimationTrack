@@ -4,7 +4,7 @@ namespace Klak.Timeline
 {
     #region Control parameter types
 
-    public enum MidiControlMode { ControlChange, MonoNote }
+    public enum MidiControlMode { Note, CC }
 
     public enum MidiNote {
         All, C, CSharp, D, DSharp, E, F, FSharp, G, GSharp, A, ASharp, B

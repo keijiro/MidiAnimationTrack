@@ -53,12 +53,7 @@ namespace Klak.Timeline
 
         public void DrawCommonSettings()
         {
-            if (ControlMode == MidiControlMode.ControlChange)
-            {
-                EditorGUI.PropertyField(_rect, _controlNumber);
-                MoveRectToNextLine();
-            }
-            else
+            if (ControlMode == MidiControlMode.Note)
             {
                 EditorGUI.PropertyField(_rect, _noteFilter, _labelNoteOctave);
                 MoveRectToNextLine();
@@ -67,6 +62,11 @@ namespace Klak.Timeline
                 r.height = MidiEnvelopeDrawer.GetHeight();
                 EditorGUI.PropertyField(r, _envelope);
                 _rect.y += r.height;
+            }
+            else // CC
+            {
+                EditorGUI.PropertyField(_rect, _controlNumber);
+                MoveRectToNextLine();
             }
 
             EditorGUI.PropertyField(_rect, _targetComponent, _labelTarget);

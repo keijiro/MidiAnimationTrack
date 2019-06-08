@@ -114,7 +114,7 @@ MonoBehaviour:
   m_Markers:
     m_Objects: []
   template:
-    controlMode: 1
+    controlMode: 0
     controls:
     - controlNumber: 1
       noteFilter:
@@ -122,9 +122,9 @@ MonoBehaviour:
         octave: 0
       envelope:
         attack: 0
-        decay: 3
+        decay: 2
         sustain: 0
-        release: 3
+        release: 2
       targetComponent:
         exposedName: e462ff9e94d4b554e97f01e774f554e6
         defaultValue: {fileID: 0}
@@ -138,9 +138,9 @@ MonoBehaviour:
         octave: 0
       envelope:
         attack: 0
-        decay: 4
+        decay: 2
         sustain: 0
-        release: 4
+        release: 2
       targetComponent:
         exposedName: 05889f2fcc41eb2428d4cd2f4e2ee8c7
         defaultValue: {fileID: 0}

@@ -116,7 +116,12 @@ namespace Klak.Timeline
                 var index = System.Array.IndexOf(_propertyNames, _propertyName.stringValue);
                 index = EditorGUI.Popup(_rect, "Property", index, _propertyLabels);
 
-                if (EditorGUI.EndChangeCheck())
+                if (index < 0)
+                {
+                    _propertyName.stringValue = "";
+                    _fieldName.stringValue = "";
+                }
+                else if (EditorGUI.EndChangeCheck())
                 {
                     _propertyName.stringValue = _propertyNames[index];
                     _fieldName.stringValue = _fieldNames[index];

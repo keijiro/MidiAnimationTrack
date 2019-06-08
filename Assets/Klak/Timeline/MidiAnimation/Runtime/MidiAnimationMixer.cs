@@ -49,7 +49,7 @@ namespace Klak.Timeline
                 }
 
                 // Controller action invocation
-                _actions[ci].Invoke(Vector4.Lerp(ctrl.vector0, ctrl.vector1, acc));
+                _actions[ci]?.Invoke(Vector4.Lerp(ctrl.vector0, ctrl.vector1, acc));
             }
         }
 

@@ -61,38 +61,9 @@ namespace Klak.Timeline
             {
                 if (e.time > current) break;
                 if (e.time <= previous) continue;
-                if ((e.status & 0xe0u) != 0x80u) continue;
+                if (!e.IsNoteOn) continue;
                 _signalPool.PushSignal(playable, output, e.data1);
             }
-        }
-
-        #endregion
-
-        #region MIDI message operators
-
-        static bool IsCC(ref MidiEvent e, int ccNumber)
-        {
-            return ((e.status & 0xb0) == 0xb0) && e.data1 == ccNumber;
-        }
-
-        static bool IsNote(ref MidiEvent e, MidiNoteFilter note)
-        {
-            if ((e.status & 0xe0) != 0x80) return false;
-
-            var num = e.data1;
-
-            // Octave test
-            if (note.octave != MidiOctave.All && num / 12 != (int)note.octave - 1) return false;
-
-            // Note (interval) test
-            if (note.note != MidiNote.All && num % 12 != (int)note.note - 1) return false;
-
-            return true;
-        }
-
-        static bool IsNoteOn(ref MidiEvent e)
-        {
-            return (e.status & 0xf0) == 0x90;
         }
 
         #endregion
@@ -105,7 +76,7 @@ namespace Klak.Timeline
             for (var i = 0; i < events.Length; i++)
             {
                 ref var e = ref events[i];
-                if (!IsCC(ref e, controlNumber)) continue;
+                if (!e.IsCC || e.data1 != controlNumber) continue;
                 if (e.time > tick) return (last, i);
                 last = i;
             }
@@ -120,9 +91,8 @@ namespace Klak.Timeline
             {
                 ref var e = ref events[i];
                 if (e.time > tick) break;
-                if ((e.status & 0xe0u) != 0x80u) continue;
-                if (!IsNote(ref e, note)) continue;
-                if (IsNoteOn(ref e)) iOn = i; else iOff = i;
+                if (!note.Check(e)) continue;
+                if (e.IsNoteOn) iOn = i; else iOff = i;
             }
             return (iOn, iOff);
         }

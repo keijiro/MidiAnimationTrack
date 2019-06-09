@@ -33,6 +33,41 @@ namespace Klak.Timeline
 
         #endregion
 
+        #region PlayableBehaviour implementation
+
+        uint _previousTick;
+
+        public override void PrepareFrame(Playable playable, FrameData info)
+        {
+            var tick = ConvertSecondToTicks((float)playable.GetTime());
+            TriggerSignalsBetween(playable, info.output, _previousTick, tick);
+            _previousTick = tick;
+        }
+
+        #endregion
+
+        #region MIDI signal emission
+
+        MidiSignalPool _signalPool = new MidiSignalPool();
+
+        void TriggerSignalsBetween(
+            Playable playable, PlayableOutput output,
+            uint previous, uint current
+        )
+        {
+            _signalPool.ResetFrame();
+
+            foreach (var e in events)
+            {
+                if (e.time > current) break;
+                if (e.time <= previous) continue;
+                if ((e.status & 0xe0u) != 0x80u) continue;
+                _signalPool.PushSignal(playable, output, e.data1);
+            }
+        }
+
+        #endregion
+
         #region MIDI message operators
 
         static bool IsCC(ref MidiEvent e, int ccNumber)
@@ -92,6 +127,11 @@ namespace Klak.Timeline
             return (iOn, iOff);
         }
 
+        uint ConvertSecondToTicks(float time)
+        {
+            return (uint)(time * tempo / 60 * ticksPerQuarterNote);
+        }
+
         float ConvertTicksToSecond(uint tick)
         {
             return tick * 60 / (tempo * ticksPerQuarterNote);
@@ -133,7 +173,7 @@ namespace Klak.Timeline
 
         float GetCCValue(MidiControl control, float time)
         {
-            var tick = (uint)(tempo * time / 60 * ticksPerQuarterNote);
+            var tick = ConvertSecondToTicks(time);
             var pair = GetCCEventIndexAroundTick(tick, control.controlNumber);
 
             if (pair.i0 < 0) return 0;
@@ -153,7 +193,7 @@ namespace Klak.Timeline
 
         float GetNoteValue(MidiControl control, float time)
         {
-            var tick = (uint)(tempo * time / 60 * ticksPerQuarterNote);
+            var tick = ConvertSecondToTicks(time);
             var pair = GetNoteEventsBeforeTick(tick, control.noteFilter);
 
             if (pair.iOn < 0) return 0;

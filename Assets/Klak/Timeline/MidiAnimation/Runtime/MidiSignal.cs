@@ -10,8 +10,8 @@ namespace Klak.Timeline
         // Notification ID (not in use)
         PropertyName INotification.id { get { return default(PropertyName);} }
 
-        // MIDI Note number
-        public int NoteNumber { get; set; }
+        // MIDI event
+        public MidiEvent Event { get; set; }
     }
 
     // Object pool class for MIDI signals
@@ -25,10 +25,10 @@ namespace Klak.Timeline
             while (_usedSignals.Count > 0) _freeSignals.Push(_usedSignals.Pop());
         }
 
-        public void PushSignal(Playable playable, PlayableOutput output, int noteNumber)
+        public void PushSignal(Playable playable, PlayableOutput output, in MidiEvent midiEvent)
         {
             var signal = _freeSignals.Count > 0 ? _freeSignals.Pop() : new MidiSignal();
-            signal.NoteNumber = noteNumber;
+            signal.Event = midiEvent;
             output.PushNotification(playable, signal);
         }
     }

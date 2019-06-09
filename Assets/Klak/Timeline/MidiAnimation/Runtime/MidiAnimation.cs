@@ -62,7 +62,7 @@ namespace Klak.Timeline
                 if (e.time > current) break;
                 if (e.time <= previous) continue;
                 if (!e.IsNoteOn) continue;
-                _signalPool.PushSignal(playable, output, e.data1);
+                _signalPool.PushSignal(playable, output, e);
             }
         }
 

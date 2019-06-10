@@ -8,6 +8,7 @@ namespace Klak.Timeline
     {
         SerializedProperty _noteFilter;
         SerializedProperty _noteOnEvent;
+        SerializedProperty _noteOffEvent;
 
         static readonly GUIContent _labelNoteOctave = new GUIContent("Note/Octave");
 
@@ -15,6 +16,7 @@ namespace Klak.Timeline
         {
             _noteFilter = serializedObject.FindProperty("noteFilter");
             _noteOnEvent = serializedObject.FindProperty("noteOnEvent");
+            _noteOffEvent = serializedObject.FindProperty("noteOffEvent");
         }
 
         public override void OnInspectorGUI()
@@ -23,6 +25,7 @@ namespace Klak.Timeline
 
             EditorGUILayout.PropertyField(_noteFilter, _labelNoteOctave);
             EditorGUILayout.PropertyField(_noteOnEvent);
+            EditorGUILayout.PropertyField(_noteOffEvent);
 
             serializedObject.ApplyModifiedProperties();
         }

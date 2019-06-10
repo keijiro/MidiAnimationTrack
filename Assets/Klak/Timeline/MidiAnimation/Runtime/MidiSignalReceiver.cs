@@ -4,6 +4,7 @@ using UnityEngine.Playables;
 
 namespace Klak.Timeline
 {
+    [ExecuteInEditMode]
     public sealed class MidiSignalReceiver : MonoBehaviour, INotificationReceiver
     {
         public MidiNoteFilter noteFilter = new MidiNoteFilter {
@@ -11,12 +12,13 @@ namespace Klak.Timeline
         };
 
         public UnityEvent noteOnEvent = new UnityEvent();
+        public UnityEvent noteOffEvent = new UnityEvent();
 
         public void OnNotify(Playable origin, INotification notification, object context)
         {
             var signal = (MidiSignal)notification;
             if (!noteFilter.Check(signal.Event)) return;
-            noteOnEvent.Invoke();
+            (signal.Event.IsNoteOn ? noteOnEvent : noteOffEvent).Invoke();
         }
     }
 }

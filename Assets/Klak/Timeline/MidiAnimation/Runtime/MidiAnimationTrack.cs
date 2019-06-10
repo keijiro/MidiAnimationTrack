@@ -6,7 +6,7 @@ namespace Klak.Timeline
 {
     [TrackColor(0.4f, 0.4f, 0.4f)]
     [TrackClipType(typeof(MidiAnimationAsset))]
-    [TrackBindingType(typeof(MidiSignalReceiver))]
+    [TrackBindingType(typeof(GameObject))]
     public class MidiAnimationTrack : TrackAsset
     {
         #region Serialized object

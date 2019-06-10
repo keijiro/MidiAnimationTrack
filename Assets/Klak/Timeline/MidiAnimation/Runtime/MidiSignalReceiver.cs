@@ -4,6 +4,8 @@ using UnityEngine.Playables;
 
 namespace Klak.Timeline
 {
+    // Receives MIDI signals (MIDI event notifications) from a timeline and
+    // invokes assigned events.
     [ExecuteInEditMode]
     public sealed class MidiSignalReceiver : MonoBehaviour, INotificationReceiver
     {
@@ -14,7 +16,8 @@ namespace Klak.Timeline
         public UnityEvent noteOnEvent = new UnityEvent();
         public UnityEvent noteOffEvent = new UnityEvent();
 
-        public void OnNotify(Playable origin, INotification notification, object context)
+        public void OnNotify
+            (Playable origin, INotification notification, object context)
         {
             var signal = (MidiSignal)notification;
             if (!noteFilter.Check(signal.Event)) return;

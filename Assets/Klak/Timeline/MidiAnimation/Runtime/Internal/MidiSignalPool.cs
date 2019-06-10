@@ -11,8 +11,7 @@ namespace Klak.Timeline
 
         public MidiSignal Allocate(in MidiEvent data)
         {
-            var signal = _freeSignals.Count > 0 ?
-                _freeSignals.Pop() : new MidiSignal();
+            var signal = _freeSignals.Count > 0 ?  _freeSignals.Pop() : new MidiSignal();
             signal.Event = data;
             _usedSignals.Push(signal);
             return signal;
@@ -20,8 +19,7 @@ namespace Klak.Timeline
 
         public void ResetFrame()
         {
-            while (_usedSignals.Count > 0)
-                _freeSignals.Push(_usedSignals.Pop());
+            while (_usedSignals.Count > 0) _freeSignals.Push(_usedSignals.Pop());
         }
     }
 }

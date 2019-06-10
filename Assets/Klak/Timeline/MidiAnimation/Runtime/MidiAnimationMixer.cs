@@ -4,7 +4,7 @@ using UnityEngine.Playables;
 namespace Klak.Timeline
 {
     [System.Serializable]
-    public class MidiAnimationMixer : PlayableBehaviour
+    public sealed class MidiAnimationMixer : PlayableBehaviour
     {
         #region Serialized variables
 
@@ -31,8 +31,7 @@ namespace Klak.Timeline
                 );
         }
 
-        public override void
-            ProcessFrame(Playable playable, FrameData info, object playerData)
+        public override void ProcessFrame(Playable playable, FrameData info, object playerData)
         {
             for (var ci = 0; ci < controls.Length; ci++)
             {

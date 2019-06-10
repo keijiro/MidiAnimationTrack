@@ -51,7 +51,7 @@ namespace Klak.Timeline
     #region Serializable MIDI control class
 
     [System.Serializable]
-    public class MidiControl
+    public sealed class MidiControl
     {
         // CC mode parameter
         public int controlNumber = 1;

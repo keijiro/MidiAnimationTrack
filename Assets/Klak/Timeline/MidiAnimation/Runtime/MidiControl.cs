@@ -19,6 +19,13 @@ namespace Klak.Timeline
     {
         public MidiNote note;
         public MidiOctave octave;
+
+        public bool Check(in MidiEvent e)
+        {
+            return e.IsNote &&
+                (octave == MidiOctave.All || e.data1 / 12 == (int)octave - 1) &&
+                (note   == MidiNote  .All || e.data1 % 12 == (int)note   - 1);
+        }
     }
 
     [System.Serializable]

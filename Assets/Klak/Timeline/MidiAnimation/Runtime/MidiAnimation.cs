@@ -33,31 +33,37 @@ namespace Klak.Timeline
 
         #endregion
 
-        #region MIDI message operators
+        #region PlayableBehaviour implementation
 
-        static bool IsCC(ref MidiEvent e, int ccNumber)
+        uint _previousTick;
+
+        public override void PrepareFrame(Playable playable, FrameData info)
         {
-            return ((e.status & 0xb0) == 0xb0) && e.data1 == ccNumber;
+            var tick = ConvertSecondToTicks((float)playable.GetTime());
+            TriggerSignalsBetween(playable, info.output, _previousTick, tick);
+            _previousTick = tick;
         }
 
-        static bool IsNote(ref MidiEvent e, MidiNoteFilter note)
+        #endregion
+
+        #region MIDI signal emission
+
+        MidiSignalPool _signalPool = new MidiSignalPool();
+
+        void TriggerSignalsBetween(
+            Playable playable, PlayableOutput output,
+            uint previous, uint current
+        )
         {
-            if ((e.status & 0xe0) != 0x80) return false;
+            _signalPool.ResetFrame();
 
-            var num = e.data1;
-
-            // Octave test
-            if (note.octave != MidiOctave.All && num / 12 != (int)note.octave - 1) return false;
-
-            // Note (interval) test
-            if (note.note != MidiNote.All && num % 12 != (int)note.note - 1) return false;
-
-            return true;
-        }
-
-        static bool IsNoteOn(ref MidiEvent e)
-        {
-            return (e.status & 0xf0) == 0x90;
+            foreach (var e in events)
+            {
+                if (e.time > current) break;
+                if (e.time <= previous) continue;
+                if (!e.IsNote) continue;
+                _signalPool.PushSignal(playable, output, e);
+            }
         }
 
         #endregion
@@ -70,7 +76,7 @@ namespace Klak.Timeline
             for (var i = 0; i < events.Length; i++)
             {
                 ref var e = ref events[i];
-                if (!IsCC(ref e, controlNumber)) continue;
+                if (!e.IsCC || e.data1 != controlNumber) continue;
                 if (e.time > tick) return (last, i);
                 last = i;
             }
@@ -85,11 +91,15 @@ namespace Klak.Timeline
             {
                 ref var e = ref events[i];
                 if (e.time > tick) break;
-                if ((e.status & 0xe0u) != 0x80u) continue;
-                if (!IsNote(ref e, note)) continue;
-                if (IsNoteOn(ref e)) iOn = i; else iOff = i;
+                if (!note.Check(e)) continue;
+                if (e.IsNoteOn) iOn = i; else iOff = i;
             }
             return (iOn, iOff);
+        }
+
+        uint ConvertSecondToTicks(float time)
+        {
+            return (uint)(time * tempo / 60 * ticksPerQuarterNote);
         }
 
         float ConvertTicksToSecond(uint tick)
@@ -133,7 +143,7 @@ namespace Klak.Timeline
 
         float GetCCValue(MidiControl control, float time)
         {
-            var tick = (uint)(tempo * time / 60 * ticksPerQuarterNote);
+            var tick = ConvertSecondToTicks(time);
             var pair = GetCCEventIndexAroundTick(tick, control.controlNumber);
 
             if (pair.i0 < 0) return 0;
@@ -153,7 +163,7 @@ namespace Klak.Timeline
 
         float GetNoteValue(MidiControl control, float time)
         {
-            var tick = (uint)(tempo * time / 60 * ticksPerQuarterNote);
+            var tick = ConvertSecondToTicks(time);
             var pair = GetNoteEventsBeforeTick(tick, control.noteFilter);
 
             if (pair.iOn < 0) return 0;

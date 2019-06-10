@@ -35,13 +35,54 @@ namespace Klak.Timeline
 
         #region PlayableBehaviour implementation
 
-        uint _previousTick;
+        float _previousTime;
+
+        public override void OnGraphStart(Playable playable)
+        {
+            _previousTime = (float)playable.GetTime();
+        }
+
+        public override void OnBehaviourPause(Playable playable, FrameData info)
+        {
+            // When the playable is being finished, signals laying in the rest
+            // of the clip should be all triggered.
+            if (!playable.IsDone()) return;
+            var duration = (float)playable.GetDuration();
+            TriggerSignals(playable, info.output, _previousTime, duration);
+        }
 
         public override void PrepareFrame(Playable playable, FrameData info)
         {
-            var tick = ConvertSecondToTicks((float)playable.GetTime());
-            TriggerSignalsBetween(playable, info.output, _previousTick, tick);
-            _previousTick = tick;
+            var current = (float)playable.GetTime();
+
+            // Playback or scrubbing?
+            if (info.evaluationType == FrameData.EvaluationType.Playback)
+            {
+                // Trigger signals between the prrevious/current time.
+                TriggerSignals(playable, info.output, _previousTime, current);
+            }
+            else
+            {
+                // Maximum allowable time difference for scrubbing
+                const float maxDiff = 0.1f;
+
+                // If the time is increasing and the difference is smaller
+                // than maxDiff, it's being scrubbed.
+                if (current - _previousTime < maxDiff)
+                {
+                    // Trigger the signals as usual.
+                    TriggerSignals(playable, info.output, _previousTime, current);
+                }
+                else
+                {
+                    // It's jumping not scrubbed, so trigger signals laying
+                    // around the current frame.
+                    var t0 = Mathf.Max(0, current - maxDiff);
+                    TriggerSignals(playable, info.output, t0, current);
+                }
+            }
+
+            _previousTime = current;
         }
 
         #endregion
@@ -50,17 +91,36 @@ namespace Klak.Timeline
 
         MidiSignalPool _signalPool = new MidiSignalPool();
 
-        void TriggerSignalsBetween(
-            Playable playable, PlayableOutput output,
-            uint previous, uint current
-        )
+        void TriggerSignals
+            (Playable playable, PlayableOutput output, float previous, float current)
         {
             _signalPool.ResetFrame();
 
+            var t0 = ConvertSecondToTicks(previous);
+            var t1 = ConvertSecondToTicks(current);
+
+            // Resolve wrapping-around cases by offsetting.
+            if (t1 < t0) t1 += (t0 / duration + 1) * duration;
+
+            // Resolve loops.
+            for (t0 %= duration; t1 >= duration; t1 -= duration)
+            {
+                // Trigger signals between t0 and the end of the clip.
+                TriggerSignalsTick(playable, output, t0, 0xffffffffu);
+                t0 = 0;
+            }
+
+            // Trigger signals between t0 and t1.
+            TriggerSignalsTick(playable, output, t0, t1);
+        }
+
+        void TriggerSignalsTick
+            (Playable playable, PlayableOutput output, uint previous, uint current)
+        {
             foreach (var e in events)
             {
-                if (e.time > current) break;
-                if (e.time <= previous) continue;
+                if (e.time >= current) break;
+                if (e.time < previous) continue;
                 if (!e.IsNote) continue;
                 output.PushNotification(playable, _signalPool.Allocate(e));
             }

@@ -1,27 +1,6 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
---- !u!114 &11400000
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: bfda56da833e2384a9677cd3c976a436, type: 3}
-  m_Name: Test
-  m_EditorClassIdentifier: 
-  m_Version: 0
-  m_Tracks:
-  - {fileID: 114010881152227116}
-  - {fileID: 114458323630856580}
-  m_FixedDuration: 0
-  m_EditorSettings:
-    m_Framerate: 60
-  m_DurationMode: 0
-  m_MarkerTrack: {fileID: 0}
---- !u!114 &114010881152227116
+--- !u!114 &-6334931870759029836
 MonoBehaviour:
   m_ObjectHideFlags: 1
   m_CorrespondingSourceObject: {fileID: 0}
@@ -48,7 +27,7 @@ MonoBehaviour:
     m_Asset: {fileID: 11400002, guid: e8314f03e24681b478de61ef5814f5d0, type: 3}
     m_Duration: 6.857142925262451
     m_TimeScale: 1
-    m_ParentTrack: {fileID: 114010881152227116}
+    m_ParentTrack: {fileID: -6334931870759029836}
     m_EaseInDuration: 0
     m_EaseOutDuration: 0
     m_BlendInDuration: -1
@@ -114,56 +93,62 @@ MonoBehaviour:
   m_Markers:
     m_Objects: []
   template:
-    controlMode: 0
     controls:
-    - controlNumber: 1
+    - mode: 0
+      ccNumber: 1
       noteFilter:
         note: 1
         octave: 0
       envelope:
         attack: 0
-        decay: 2
-        sustain: 0
-        release: 2
+        decay: 1
+        sustain: 0.4
+        release: 5
       targetComponent:
-        exposedName: e462ff9e94d4b554e97f01e774f554e6
+        exposedName: 78c00252b1e9c893c969942f90aa40cf
         defaultValue: {fileID: 0}
-      propertyName: intensity
-      fieldName: m_Intensity
-      vector0: {x: 0, y: 0.07144785, z: 1, w: 0}
-      vector1: {x: 10, y: 2, z: 0, w: 0}
-    - controlNumber: 0
+      propertyName: localPosition
+      fieldName: m_LocalPosition
+      vector0: {x: -1, y: 0, z: 0, w: 0}
+      vector1: {x: -1, y: 1, z: 0, w: 0}
+    - mode: 0
+      ccNumber: 1
       noteFilter:
         note: 3
         octave: 0
       envelope:
         attack: 0
-        decay: 2
-        sustain: 0
-        release: 2
+        decay: 1
+        sustain: 0.4
+        release: 5
       targetComponent:
-        exposedName: 05889f2fcc41eb2428d4cd2f4e2ee8c7
+        exposedName: d0ca5bb8fadf9ce8d93e8c46ee348427
         defaultValue: {fileID: 0}
-      propertyName: intensity
-      fieldName: m_Intensity
-      vector0: {x: 0, y: 0.5, z: 0.5, w: 0}
-      vector1: {x: 10, y: 1, z: 1, w: 0}
-    - controlNumber: 0
-      noteFilter:
-        note: 5
-        octave: 0
-      envelope:
-        attack: 0
-        decay: 2
-        sustain: 0
-        release: 2
-      targetComponent:
-        exposedName: 96132e20402afb541a0e08d0483f942e
-        defaultValue: {fileID: 0}
-      propertyName: intensity
-      fieldName: m_Intensity
-      vector0: {x: 0, y: 0, z: 0, w: 0}
-      vector1: {x: 10, y: 0, z: 0, w: 0}
+      propertyName: localScale
+      fieldName: m_LocalScale
+      vector0: {x: 1, y: 1, z: 1, w: 0}
+      vector1: {x: 2, y: 2, z: 2, w: 0}
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bfda56da833e2384a9677cd3c976a436, type: 3}
+  m_Name: Test
+  m_EditorClassIdentifier: 
+  m_Version: 0
+  m_Tracks:
+  - {fileID: 114458323630856580}
+  - {fileID: -6334931870759029836}
+  m_FixedDuration: 0
+  m_EditorSettings:
+    m_Framerate: 60
+  m_DurationMode: 0
+  m_MarkerTrack: {fileID: 0}
 --- !u!114 &114458323630856580
 MonoBehaviour:
   m_ObjectHideFlags: 1

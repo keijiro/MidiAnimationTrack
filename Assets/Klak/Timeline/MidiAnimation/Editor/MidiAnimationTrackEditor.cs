@@ -38,9 +38,24 @@ namespace Klak.Timeline
 
             EditorGUILayout.Space();
             if (GUILayout.Button("Add Control Element"))
-                _controls.InsertArrayElementAtIndex(_controls.arraySize);
+                AppendDefaultMidiControl();
 
             serializedObject.ApplyModifiedProperties();
+        }
+
+        #endregion
+
+        #region Private methods
+
+        void AppendDefaultMidiControl()
+        {
+            var index = _controls.arraySize;
+            _controls.InsertArrayElementAtIndex(index);
+            var prop = _controls.GetArrayElementAtIndex(index);
+            prop.FindPropertyRelative("ccNumber").intValue = 1;
+            prop.FindPropertyRelative("envelope.decay").floatValue = 0.5f;
+            prop.FindPropertyRelative("envelope.sustain").floatValue = 0.5f;
+            prop.FindPropertyRelative("vector1").vector4Value = Vector3.forward;
         }
 
         #endregion

@@ -25,8 +25,10 @@ namespace Klak.Timeline
         {
             if (events == null) return 0;
             var t = (float)playable.GetTime() % DurationInSecond;
-            if (control.mode == MidiControl.Mode.Note)
-                return GetNoteValue(control, t);
+            if (control.mode == MidiControl.Mode.NoteEnvelope)
+                return GetNoteEnvelopeValue(control, t);
+            else if (control.mode == MidiControl.Mode.NoteCurve)
+                return GetNoteCurveValue(control, t);
             else // CC
                 return GetCCValue(control, t);
         }
@@ -201,27 +203,7 @@ namespace Klak.Timeline
 
         #region Value calculation methods
 
-        float GetCCValue(MidiControl control, float time)
-        {
-            var tick = ConvertSecondToTicks(time);
-            var pair = GetCCEventIndexAroundTick(tick, control.ccNumber);
-
-            if (pair.i0 < 0) return 0;
-            if (pair.i1 < 0) return events[pair.i0].data2 / 127.0f;
-
-            ref var e0 = ref events[pair.i0];
-            ref var e1 = ref events[pair.i1];
-
-            var t0 = ConvertTicksToSecond(e0.time);
-            var t1 = ConvertTicksToSecond(e1.time);
-
-            var v0 = e0.data2 / 127.0f;
-            var v1 = e1.data2 / 127.0f;
-
-            return Mathf.Lerp(v0, v1, Mathf.Clamp01((time - t0) / (t1 - t0)));
-        }
-
-        float GetNoteValue(MidiControl control, float time)
+        float GetNoteEnvelopeValue(MidiControl control, float time)
         {
             var tick = ConvertSecondToTicks(time);
             var pair = GetNoteEventsBeforeTick(tick, control.noteFilter);
@@ -245,6 +227,43 @@ namespace Klak.Timeline
             var velocity = eOn.data2 / 127.0f;
 
             return envelope * velocity;
+        }
+
+        float GetNoteCurveValue(MidiControl control, float time)
+        {
+            var tick = ConvertSecondToTicks(time);
+            var pair = GetNoteEventsBeforeTick(tick, control.noteFilter);
+
+            if (pair.iOn < 0) return 0;
+            ref var eOn = ref events[pair.iOn]; // Note-on event
+
+            // Note-on time
+            var onTime = ConvertTicksToSecond(eOn.time);
+
+            var curve = control.curve.Evaluate(Mathf.Max(0, time - onTime));
+            var velocity = eOn.data2 / 127.0f;
+
+            return curve * velocity;
+        }
+
+        float GetCCValue(MidiControl control, float time)
+        {
+            var tick = ConvertSecondToTicks(time);
+            var pair = GetCCEventIndexAroundTick(tick, control.ccNumber);
+
+            if (pair.i0 < 0) return 0;
+            if (pair.i1 < 0) return events[pair.i0].data2 / 127.0f;
+
+            ref var e0 = ref events[pair.i0];
+            ref var e1 = ref events[pair.i1];
+
+            var t0 = ConvertTicksToSecond(e0.time);
+            var t1 = ConvertTicksToSecond(e1.time);
+
+            var v0 = e0.data2 / 127.0f;
+            var v1 = e1.data2 / 127.0f;
+
+            return Mathf.Lerp(v0, v1, Mathf.Clamp01((time - t0) / (t1 - t0)));
         }
 
         #endregion

@@ -45,7 +45,17 @@ namespace Klak.Timeline
 
         #endregion
 
-        #region Private method
+        #region Private property and method
+
+        AnimationCurve defaultCurve {
+            get {
+                return new AnimationCurve(
+                    new Keyframe(0, 0, 90, 90),
+                    new Keyframe(0.02f, 1),
+                    new Keyframe(0.5f, 0)
+                );
+            }
+        }
 
         void AppendDefaultMidiControl()
         {
@@ -53,13 +63,14 @@ namespace Klak.Timeline
             _controls.InsertArrayElementAtIndex(index);
             var prop = _controls.GetArrayElementAtIndex(index);
             prop.FindPropertyRelative("mode").enumValueIndex = 0;
-            prop.FindPropertyRelative("ccNumber").intValue = 1;
             prop.FindPropertyRelative("noteFilter.note").enumValueIndex = 0;
             prop.FindPropertyRelative("noteFilter.octave").enumValueIndex = 0;
             prop.FindPropertyRelative("envelope.attack").floatValue = 0;
             prop.FindPropertyRelative("envelope.decay").floatValue = 1;
             prop.FindPropertyRelative("envelope.sustain").floatValue = 0.5f;
             prop.FindPropertyRelative("envelope.release").floatValue = 1;
+            prop.FindPropertyRelative("curve").animationCurveValue = defaultCurve;
+            prop.FindPropertyRelative("ccNumber").intValue = 1;
             prop.FindPropertyRelative("targetComponent.exposedName").stringValue = "";
             prop.FindPropertyRelative("propertyName").stringValue = "";
             prop.FindPropertyRelative("fieldName").stringValue = "";

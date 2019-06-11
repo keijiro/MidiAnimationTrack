@@ -54,17 +54,20 @@ namespace Klak.Timeline
         // Default values are given in MidiAnimationTrackEditor.
 
         // Control mode (Note/CC)
-        public enum Mode { Note, CC }
+        public enum Mode { NoteEnvelope, NoteCurve, CC }
         public Mode mode;
 
-        // CC mode parameter
-        public int ccNumber;
-
-        // Note mode parameters
+        // (Note mode) Note filter
         public MidiNoteFilter noteFilter;
 
-        // Envelope parameters
+        // (Note Envelope mode) Envelope parameters
         public MidiEnvelope envelope;
+
+        // (Note Curve mode) Envelope curve
+        public AnimationCurve curve;
+
+        // (CC mode) CC number
+        public int ccNumber;
 
         // Component/property options
         public ExposedReference<Component> targetComponent;

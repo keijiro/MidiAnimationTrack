@@ -95,24 +95,6 @@ MonoBehaviour:
   template:
     controls:
     - mode: 0
-      ccNumber: 1
-      noteFilter:
-        note: 1
-        octave: 0
-      envelope:
-        attack: 0
-        decay: 1
-        sustain: 0.4
-        release: 5
-      targetComponent:
-        exposedName: 78c00252b1e9c893c969942f90aa40cf
-        defaultValue: {fileID: 0}
-      propertyName: localPosition
-      fieldName: m_LocalPosition
-      vector0: {x: -1, y: 0, z: 0, w: 0}
-      vector1: {x: -1, y: 1, z: 0, w: 0}
-    - mode: 0
-      ccNumber: 1
       noteFilter:
         note: 3
         octave: 0
@@ -121,6 +103,13 @@ MonoBehaviour:
         decay: 1
         sustain: 0.4
         release: 5
+      curve:
+        serializedVersion: 2
+        m_Curve: []
+        m_PreInfinity: 2
+        m_PostInfinity: 2
+        m_RotationOrder: 4
+      ccNumber: 1
       targetComponent:
         exposedName: d0ca5bb8fadf9ce8d93e8c46ee348427
         defaultValue: {fileID: 0}
@@ -128,6 +117,56 @@ MonoBehaviour:
       fieldName: m_LocalScale
       vector0: {x: 1, y: 1, z: 1, w: 0}
       vector1: {x: 2, y: 2, z: 2, w: 0}
+    - mode: 1
+      noteFilter:
+        note: 1
+        octave: 0
+      envelope:
+        attack: 0
+        decay: 1
+        sustain: 0.5
+        release: 1
+      curve:
+        serializedVersion: 2
+        m_Curve:
+        - serializedVersion: 3
+          time: 0
+          value: 0
+          inSlope: 90
+          outSlope: 90
+          tangentMode: 0
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        - serializedVersion: 3
+          time: 0.02
+          value: 1
+          inSlope: 0
+          outSlope: 0
+          tangentMode: 0
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        - serializedVersion: 3
+          time: 0.5
+          value: 0
+          inSlope: 0
+          outSlope: 0
+          tangentMode: 0
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        m_PreInfinity: 2
+        m_PostInfinity: 2
+        m_RotationOrder: 4
+      ccNumber: 1
+      targetComponent:
+        exposedName: 0323838fca6c1058e983682205fb693f
+        defaultValue: {fileID: 0}
+      propertyName: localPosition
+      fieldName: m_LocalPosition
+      vector0: {x: -1, y: 0, z: 0, w: 0}
+      vector1: {x: -1, y: 1, z: 0, w: 0}
 --- !u!114 &11400000
 MonoBehaviour:
   m_ObjectHideFlags: 0

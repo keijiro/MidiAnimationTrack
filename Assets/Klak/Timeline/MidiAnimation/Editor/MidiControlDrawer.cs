@@ -17,9 +17,10 @@ namespace Klak.Timeline
         public MidiControlDrawer(SerializedProperty property)
         {
             _mode       = property.FindPropertyRelative("mode");
-            _ccNumber   = property.FindPropertyRelative("ccNumber");
             _noteFilter = property.FindPropertyRelative("noteFilter");
             _envelope   = property.FindPropertyRelative("envelope");
+            _curve      = property.FindPropertyRelative("curve");
+            _ccNumber   = property.FindPropertyRelative("ccNumber");
 
             _targetComponent = property.FindPropertyRelative("targetComponent");
             _propertyName    = property.FindPropertyRelative("propertyName");
@@ -55,7 +56,7 @@ namespace Klak.Timeline
             EditorGUI.PropertyField(_rect, _mode, _labelControlMode);
             MoveRectToNextLine();
 
-            if (_mode.enumValueIndex == (int)MidiControl.Mode.Note)
+            if (_mode.enumValueIndex == (int)MidiControl.Mode.NoteEnvelope)
             {
                 EditorGUI.PropertyField(_rect, _noteFilter, _labelNoteOctave);
                 MoveRectToNextLine();
@@ -64,6 +65,14 @@ namespace Klak.Timeline
                 r.height = MidiEnvelopeDrawer.GetHeight();
                 EditorGUI.PropertyField(r, _envelope);
                 _rect.y += r.height;
+            }
+            else if (_mode.enumValueIndex == (int)MidiControl.Mode.NoteCurve)
+            {
+                EditorGUI.PropertyField(_rect, _noteFilter, _labelNoteOctave);
+                MoveRectToNextLine();
+
+                EditorGUI.PropertyField(_rect, _curve);
+                MoveRectToNextLine();
             }
             else // CC
             {
@@ -221,9 +230,10 @@ namespace Klak.Timeline
         #region Private members
 
         SerializedProperty _mode;
-        SerializedProperty _ccNumber;
         SerializedProperty _noteFilter;
         SerializedProperty _envelope;
+        SerializedProperty _curve;
+        SerializedProperty _ccNumber;
 
         SerializedProperty _targetComponent;
         SerializedProperty _propertyName;

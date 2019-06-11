@@ -45,16 +45,25 @@ namespace Klak.Timeline
 
         #endregion
 
-        #region Private methods
+        #region Private method
 
         void AppendDefaultMidiControl()
         {
             var index = _controls.arraySize;
             _controls.InsertArrayElementAtIndex(index);
             var prop = _controls.GetArrayElementAtIndex(index);
+            prop.FindPropertyRelative("mode").enumValueIndex = 0;
             prop.FindPropertyRelative("ccNumber").intValue = 1;
-            prop.FindPropertyRelative("envelope.decay").floatValue = 0.5f;
+            prop.FindPropertyRelative("noteFilter.note").enumValueIndex = 0;
+            prop.FindPropertyRelative("noteFilter.octave").enumValueIndex = 0;
+            prop.FindPropertyRelative("envelope.attack").floatValue = 0;
+            prop.FindPropertyRelative("envelope.decay").floatValue = 1;
             prop.FindPropertyRelative("envelope.sustain").floatValue = 0.5f;
+            prop.FindPropertyRelative("envelope.release").floatValue = 1;
+            prop.FindPropertyRelative("targetComponent.exposedName").stringValue = "";
+            prop.FindPropertyRelative("propertyName").stringValue = "";
+            prop.FindPropertyRelative("fieldName").stringValue = "";
+            prop.FindPropertyRelative("vector0").vector4Value = Vector3.zero;
             prop.FindPropertyRelative("vector1").vector4Value = Vector3.forward;
         }
 

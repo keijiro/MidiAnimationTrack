@@ -9,23 +9,16 @@ namespace Klak.Timeline
     {
         #region Editor implementation
 
-        SerializedProperty _controlMode;
         SerializedProperty _controls;
 
         void OnEnable()
         {
-            _controlMode = serializedObject.FindProperty("template.controlMode");
             _controls = serializedObject.FindProperty("template.controls");
         }
 
         public override void OnInspectorGUI()
         {
             serializedObject.Update();
-
-            EditorGUILayout.PropertyField(_controlMode);
-            EditorGUILayout.Space();
-
-            MidiControlDrawer.ControlMode = (MidiControlMode)_controlMode.enumValueIndex;
 
             EditorGUI.BeginChangeCheck();
 

@@ -8,7 +8,6 @@ namespace Klak.Timeline
     {
         #region Serialized variables
 
-        public MidiControlMode controlMode = MidiControlMode.Note;
         public MidiControl [] controls = new MidiControl [0];
 
         #endregion
@@ -44,7 +43,7 @@ namespace Klak.Timeline
                 {
                     var clip = (ScriptPlayable<MidiAnimation>)playable.GetInput(i);
                     acc += playable.GetInputWeight(i) *
-                        clip.GetBehaviour().GetValue(clip, ctrl, controlMode);
+                        clip.GetBehaviour().GetValue(clip, ctrl);
                 }
 
                 // Controller action invocation

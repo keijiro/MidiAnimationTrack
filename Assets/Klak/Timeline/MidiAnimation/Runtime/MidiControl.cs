@@ -4,8 +4,6 @@ namespace Klak.Timeline
 {
     #region Control parameter types
 
-    public enum MidiControlMode { Note, CC }
-
     public enum MidiNote {
         All, C, CSharp, D, DSharp, E, F, FSharp, G, GSharp, A, ASharp, B
     }
@@ -53,10 +51,14 @@ namespace Klak.Timeline
     [System.Serializable]
     public sealed class MidiControl
     {
-        // CC mode parameter
-        public int controlNumber = 1;
+        // Control mode (Note/CC)
+        public enum Mode { Note, CC }
+        public Mode mode = Mode.Note;
 
-        // Mono note mode parameters
+        // CC mode parameter
+        public int ccNumber = 1;
+
+        // Note mode parameters
         public MidiNoteFilter noteFilter = new MidiNoteFilter {
             note = MidiNote.All, octave = MidiOctave.All
         };

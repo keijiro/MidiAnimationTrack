@@ -16,9 +16,10 @@ namespace Klak.Timeline
 
         public MidiControlDrawer(SerializedProperty property)
         {
-            _controlNumber = property.FindPropertyRelative("controlNumber");
-            _noteFilter    = property.FindPropertyRelative("noteFilter");
-            _envelope      = property.FindPropertyRelative("envelope");
+            _mode       = property.FindPropertyRelative("mode");
+            _ccNumber   = property.FindPropertyRelative("ccNumber");
+            _noteFilter = property.FindPropertyRelative("noteFilter");
+            _envelope   = property.FindPropertyRelative("envelope");
 
             _targetComponent = property.FindPropertyRelative("targetComponent");
             _propertyName    = property.FindPropertyRelative("propertyName");
@@ -27,8 +28,6 @@ namespace Klak.Timeline
             _vector0 = property.FindPropertyRelative("vector0");
             _vector1 = property.FindPropertyRelative("vector1");
         }
-
-        public static MidiControlMode ControlMode { get; set; }
 
         public Component TargetComponent {
             get { return (Component)(_targetComponent.exposedReferenceValue); }
@@ -53,7 +52,10 @@ namespace Klak.Timeline
 
         public void DrawCommonSettings()
         {
-            if (ControlMode == MidiControlMode.Note)
+            EditorGUI.PropertyField(_rect, _mode, _labelControlMode);
+            MoveRectToNextLine();
+
+            if (_mode.enumValueIndex == (int)MidiControl.Mode.Note)
             {
                 EditorGUI.PropertyField(_rect, _noteFilter, _labelNoteOctave);
                 MoveRectToNextLine();
@@ -65,7 +67,7 @@ namespace Klak.Timeline
             }
             else // CC
             {
-                EditorGUI.PropertyField(_rect, _controlNumber);
+                EditorGUI.PropertyField(_rect, _ccNumber, _labelCCNumber);
                 MoveRectToNextLine();
             }
 
@@ -209,6 +211,8 @@ namespace Klak.Timeline
 
         #region UI resources
 
+        static readonly GUIContent _labelControlMode = new GUIContent("Control Mode");
+        static readonly GUIContent _labelCCNumber = new GUIContent("CC Number");
         static readonly GUIContent _labelTarget = new GUIContent("Target");
         static readonly GUIContent _labelNoteOctave = new GUIContent("Note/Octave");
 
@@ -216,7 +220,8 @@ namespace Klak.Timeline
 
         #region Private members
 
-        SerializedProperty _controlNumber;
+        SerializedProperty _mode;
+        SerializedProperty _ccNumber;
         SerializedProperty _noteFilter;
         SerializedProperty _envelope;
 

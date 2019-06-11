@@ -21,11 +21,11 @@ namespace Klak.Timeline
             get { return duration / tempo * 60 / ticksPerQuarterNote; }
         }
 
-        public float GetValue(Playable playable, MidiControl control, MidiControlMode mode)
+        public float GetValue(Playable playable, MidiControl control)
         {
             if (events == null) return 0;
             var t = (float)playable.GetTime() % DurationInSecond;
-            if (mode == MidiControlMode.Note)
+            if (control.mode == MidiControl.Mode.Note)
                 return GetNoteValue(control, t);
             else // CC
                 return GetCCValue(control, t);
@@ -130,13 +130,13 @@ namespace Klak.Timeline
 
         #region Private variables and methods
 
-        (int i0, int i1) GetCCEventIndexAroundTick(uint tick, int controlNumber)
+        (int i0, int i1) GetCCEventIndexAroundTick(uint tick, int ccNumber)
         {
             var last = -1;
             for (var i = 0; i < events.Length; i++)
             {
                 ref var e = ref events[i];
-                if (!e.IsCC || e.data1 != controlNumber) continue;
+                if (!e.IsCC || e.data1 != ccNumber) continue;
                 if (e.time > tick) return (last, i);
                 last = i;
             }
@@ -204,7 +204,7 @@ namespace Klak.Timeline
         float GetCCValue(MidiControl control, float time)
         {
             var tick = ConvertSecondToTicks(time);
-            var pair = GetCCEventIndexAroundTick(tick, control.controlNumber);
+            var pair = GetCCEventIndexAroundTick(tick, control.ccNumber);
 
             if (pair.i0 < 0) return 0;
             if (pair.i1 < 0) return events[pair.i0].data2 / 127.0f;

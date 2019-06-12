@@ -22,23 +22,37 @@ namespace Klak.Timeline
 
             EditorGUI.BeginChangeCheck();
 
+            // Draw all the controls using the "header with a toggle" style.
             for (var i = 0; i < _controls.arraySize; i++)
             {
-                DrawSplitter();
-                DrawHeader(i);
-                EditorGUILayout.Space();
-                EditorGUILayout.PropertyField(_controls.GetArrayElementAtIndex(i));
-                EditorGUILayout.Space();
+                CoreEditorUtils.DrawSplitter();
+
+                var title = "Control Element " + (i + 1);
+                var control = _controls.GetArrayElementAtIndex(i);
+                var enabled = control.FindPropertyRelative("enabled");
+
+                var toggle = CoreEditorUtils.DrawHeaderToggle
+                    (title, control, enabled, pos => OnContextClick(pos, i));
+
+                if (!toggle) continue;
+
+                using (new EditorGUI.DisabledScope(!enabled.boolValue))
+                {
+                    EditorGUILayout.Space();
+                    EditorGUILayout.PropertyField(control);
+                }
             }
 
+            // We have to manually refresh the timeline.
             if (EditorGUI.EndChangeCheck())
                 TimelineEditor.Refresh(RefreshReason.ContentsModified);
 
-            DrawSplitter();
+            if (_controls.arraySize > 0) CoreEditorUtils.DrawSplitter();
 
             EditorGUILayout.Space();
-            if (GUILayout.Button("Add Control Element"))
-                AppendDefaultMidiControl();
+
+            // "Add" button
+            if (GUILayout.Button("Add Control Element")) AppendDefaultMidiControl();
 
             serializedObject.ApplyModifiedProperties();
         }
@@ -61,7 +75,11 @@ namespace Klak.Timeline
         {
             var index = _controls.arraySize;
             _controls.InsertArrayElementAtIndex(index);
+
             var prop = _controls.GetArrayElementAtIndex(index);
+            prop.isExpanded = true;
+
+            prop.FindPropertyRelative("enabled").boolValue = true;
             prop.FindPropertyRelative("mode").enumValueIndex = 0;
             prop.FindPropertyRelative("noteFilter.note").enumValueIndex = 0;
             prop.FindPropertyRelative("noteFilter.octave").enumValueIndex = 0;
@@ -80,58 +98,45 @@ namespace Klak.Timeline
 
         #endregion
 
-        #region Custom UI elements
+        #region Context menu
 
-        void DrawSplitter()
+        static class Labels
         {
-            var rect = GUILayoutUtility.GetRect(1, 1);
-            rect.xMin = 0;
-            rect.width += 4;
-            EditorGUI.DrawRect(rect, MidiEditorStyles.splitter);
+            public static readonly GUIContent MoveUp = new GUIContent("Move Up");
+            public static readonly GUIContent MoveDown = new GUIContent("Move Down");
+            public static readonly GUIContent Remove = new GUIContent("Remove");
         }
 
-        void DrawHeader(int index)
+        void OnContextClick(Vector2 pos, int index)
         {
-            var bgRect = GUILayoutUtility.GetRect(1, 17);
+            var menu = new GenericMenu();
 
-            var labelRect = bgRect;
-            labelRect.xMin -= 4;
-            labelRect.xMax -= 20;
+            // "Move Up"
+            if (index == 0)
+                menu.AddDisabledItem(Labels.MoveUp);
+            else
+                menu.AddItem(Labels.MoveUp, false, () => OnMoveControl(index, index - 1));
 
-            var menuIcon = MidiEditorStyles.gearIcon;
-            var menuRect = new Rect(
-                labelRect.xMax + 4, labelRect.y + 4,
-                menuIcon.width, menuIcon.height
-            );
+            // "Move Down"
+            if (index == _controls.arraySize - 1)
+                menu.AddDisabledItem(Labels.MoveDown);
+            else
+                menu.AddItem(Labels.MoveDown, false, () => OnMoveControl(index, index + 1));
 
-            // Background rect should be full-width
-            bgRect.xMin = 0;
-            bgRect.width += 4;
+            menu.AddSeparator(string.Empty);
 
-            // Background
-            EditorGUI.DrawRect(bgRect, MidiEditorStyles.headerBackground);
+            // "Remove"
+            menu.AddItem(Labels.Remove, false, () => OnRemoveControl(index));
 
-            // Title
-            var title = "Control Element " + (index + 1);
-            EditorGUI.LabelField(labelRect, title, EditorStyles.boldLabel);
+            // Show the drop down.
+            menu.DropDown(new Rect(pos, Vector2.zero));
+        }
 
-            // Dropdown menu icon
-            GUI.DrawTexture(menuRect, menuIcon);
-
-            // Handle events
-            var e = Event.current;
-
-            if (e.type == EventType.MouseDown && menuRect.Contains(e.mousePosition))
-            {
-                // Header context menu
-                var menu = new GenericMenu();
-                menu.AddItem(
-                    new GUIContent("Remove"), false,
-                    () => OnRemoveControl(index)
-                );
-                menu.DropDown(new Rect(menuRect.x, menuRect.yMax, 0, 0));
-                e.Use();
-            }
+        void OnMoveControl(int src, int dst)
+        {
+            serializedObject.Update();
+            _controls.MoveArrayElement(src, dst);
+            serializedObject.ApplyModifiedProperties();
         }
 
         void OnRemoveControl(int index)

@@ -53,6 +53,9 @@ namespace Klak.Timeline
     {
         // Default values are given in MidiAnimationTrackEditor.
 
+        // Is this control enabled?
+        public bool enabled;
+
         // Control mode (Note/CC)
         public enum Mode { NoteEnvelope, NoteCurve, CC }
         public Mode mode;

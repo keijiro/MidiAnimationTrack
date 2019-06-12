@@ -35,6 +35,7 @@ namespace Klak.Timeline
             for (var ci = 0; ci < controls.Length; ci++)
             {
                 var ctrl = controls[ci];
+                if (!ctrl.enabled) continue;
 
                 // Controller value accumulation
                 var acc = 0.0f;

@@ -32,6 +32,8 @@ namespace Klak.Timeline
 
             foreach (var ctrl in template.controls)
             {
+                if (!ctrl.enabled) continue;
+
                 var component = ctrl.targetComponent.Resolve(director);
                 if (component == null) continue;
 

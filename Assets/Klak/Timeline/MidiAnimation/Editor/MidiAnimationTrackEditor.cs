@@ -79,6 +79,11 @@ namespace Klak.Timeline
             var prop = _controls.GetArrayElementAtIndex(index);
             prop.isExpanded = true;
 
+            ResetControl(prop);
+        }
+
+        void ResetControl(SerializedProperty prop)
+        {
             prop.FindPropertyRelative("enabled").boolValue = true;
             prop.FindPropertyRelative("mode").enumValueIndex = 0;
             prop.FindPropertyRelative("noteFilter.note").enumValueIndex = 0;
@@ -104,7 +109,10 @@ namespace Klak.Timeline
         {
             public static readonly GUIContent MoveUp = new GUIContent("Move Up");
             public static readonly GUIContent MoveDown = new GUIContent("Move Down");
+            public static readonly GUIContent Reset = new GUIContent("Reset");
             public static readonly GUIContent Remove = new GUIContent("Remove");
+            public static readonly GUIContent Copy = new GUIContent("Copy");
+            public static readonly GUIContent Paste = new GUIContent("Paste");
         }
 
         void OnContextClick(Vector2 pos, int index)
@@ -123,10 +131,15 @@ namespace Klak.Timeline
             else
                 menu.AddItem(Labels.MoveDown, false, () => OnMoveControl(index, index + 1));
 
+            // "Reset" / "Remove"
             menu.AddSeparator(string.Empty);
-
-            // "Remove"
+            menu.AddItem(Labels.Reset, false, () => OnResetControl(index));
             menu.AddItem(Labels.Remove, false, () => OnRemoveControl(index));
+
+            // "Copy" / "Paste"
+            menu.AddSeparator(string.Empty);
+            menu.AddItem(Labels.Copy, false, () => OnCopyControl(index));
+            menu.AddItem(Labels.Paste, false, () => OnPasteControl(index));
 
             // Show the drop down.
             menu.DropDown(new Rect(pos, Vector2.zero));
@@ -139,11 +152,28 @@ namespace Klak.Timeline
             serializedObject.ApplyModifiedProperties();
         }
 
+        void OnResetControl(int index)
+        {
+            serializedObject.Update();
+            ResetControl(_controls.GetArrayElementAtIndex(index));
+            serializedObject.ApplyModifiedProperties();
+        }
+
         void OnRemoveControl(int index)
         {
             serializedObject.Update();
             _controls.DeleteArrayElementAtIndex(index);
             serializedObject.ApplyModifiedProperties();
+        }
+
+        void OnCopyControl(int index)
+        {
+            Debug.Log("Not implemented");
+        }
+
+        void OnPasteControl(int index)
+        {
+            Debug.Log("Not implemented");
         }
 
         #endregion

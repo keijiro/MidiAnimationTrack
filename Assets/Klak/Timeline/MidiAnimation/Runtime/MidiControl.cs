@@ -51,26 +51,32 @@ namespace Klak.Timeline
     [System.Serializable]
     public sealed class MidiControl
     {
-        // Default values are given in MidiAnimationTrackEditor.
-
         // Is this control enabled?
-        public bool enabled;
+        public bool enabled = true;
 
         // Control mode (Note/CC)
         public enum Mode { NoteEnvelope, NoteCurve, CC }
-        public Mode mode;
+        public Mode mode = Mode.NoteEnvelope;
 
         // (Note mode) Note filter
-        public MidiNoteFilter noteFilter;
+        public MidiNoteFilter noteFilter = new MidiNoteFilter {
+            note = MidiNote.All, octave = MidiOctave.All
+        };
 
         // (Note Envelope mode) Envelope parameters
-        public MidiEnvelope envelope;
+        public MidiEnvelope envelope = new MidiEnvelope {
+            attack = 0, decay = 1, sustain = 0.5f, release = 1
+        };
 
         // (Note Curve mode) Envelope curve
-        public AnimationCurve curve;
+        public AnimationCurve curve = new AnimationCurve(
+            new Keyframe(0, 0, 90, 90),
+            new Keyframe(0.02f, 1),
+            new Keyframe(0.5f, 0)
+        );
 
         // (CC mode) CC number
-        public int ccNumber;
+        public int ccNumber = 1;
 
         // Component/property options
         public ExposedReference<Component> targetComponent;
@@ -79,7 +85,7 @@ namespace Klak.Timeline
 
         // Value options
         public Vector4 vector0;
-        public Vector4 vector1;
+        public Vector4 vector1 = Vector3.one;
     }
 
     #endregion

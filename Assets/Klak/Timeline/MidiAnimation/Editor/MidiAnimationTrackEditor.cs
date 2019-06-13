@@ -40,6 +40,9 @@ namespace Klak.Timeline
                 {
                     EditorGUILayout.Space();
                     EditorGUILayout.PropertyField(control);
+                    // All modifications should be applied at this moment
+                    // because DrawHeaderToggle implicitly discards them.
+                    serializedObject.ApplyModifiedProperties();
                 }
             }
 
@@ -48,57 +51,60 @@ namespace Klak.Timeline
                 TimelineEditor.Refresh(RefreshReason.ContentsModified);
 
             if (_controls.arraySize > 0) CoreEditorUtils.DrawSplitter();
-
             EditorGUILayout.Space();
 
             // "Add" button
             if (GUILayout.Button("Add Control Element")) AppendDefaultMidiControl();
-
-            serializedObject.ApplyModifiedProperties();
         }
 
         #endregion
 
-        #region Private property and method
-
-        AnimationCurve defaultCurve {
-            get {
-                return new AnimationCurve(
-                    new Keyframe(0, 0, 90, 90),
-                    new Keyframe(0.02f, 1),
-                    new Keyframe(0.5f, 0)
-                );
-            }
-        }
+        #region Editor helper methods
 
         void AppendDefaultMidiControl()
         {
+            // Expand the array via SerializedProperty.
             var index = _controls.arraySize;
             _controls.InsertArrayElementAtIndex(index);
 
             var prop = _controls.GetArrayElementAtIndex(index);
             prop.isExpanded = true;
 
-            ResetControl(prop);
+            serializedObject.ApplyModifiedProperties();
+
+            // Set a new control instance.
+            var track = (MidiAnimationTrack)target;
+            var controls = track.template.controls;
+            Undo.RecordObject(track, "Add MIDI Control");
+            controls[controls.Length - 1] = new MidiControl();
         }
 
-        void ResetControl(SerializedProperty prop)
+        void CopyControl(MidiControl src, MidiControl dst, bool updateGuid)
         {
-            prop.FindPropertyRelative("enabled").boolValue = true;
-            prop.FindPropertyRelative("mode").enumValueIndex = 0;
-            prop.FindPropertyRelative("noteFilter.note").enumValueIndex = 0;
-            prop.FindPropertyRelative("noteFilter.octave").enumValueIndex = 0;
-            prop.FindPropertyRelative("envelope.attack").floatValue = 0;
-            prop.FindPropertyRelative("envelope.decay").floatValue = 1;
-            prop.FindPropertyRelative("envelope.sustain").floatValue = 0.5f;
-            prop.FindPropertyRelative("envelope.release").floatValue = 1;
-            prop.FindPropertyRelative("curve").animationCurveValue = defaultCurve;
-            prop.FindPropertyRelative("ccNumber").intValue = 1;
-            prop.FindPropertyRelative("targetComponent.exposedName").stringValue = "";
-            prop.FindPropertyRelative("propertyName").stringValue = "";
-            prop.FindPropertyRelative("fieldName").stringValue = "";
-            prop.FindPropertyRelative("vector0").vector4Value = Vector3.zero;
-            prop.FindPropertyRelative("vector1").vector4Value = Vector3.forward;
+            // Copy MidiControl members.
+            // Is there any smarter way to do this?
+            dst.enabled = src.enabled;
+            dst.mode = src.mode;
+            dst.noteFilter = src.noteFilter;
+            dst.envelope = src.envelope;
+            dst.curve = new AnimationCurve(src.curve.keys);
+            dst.propertyName = src.propertyName;
+            dst.fieldName = src.fieldName;
+            dst.ccNumber = src.ccNumber;
+            dst.vector0 = src.vector0;
+            dst.vector1 = src.vector1;
+
+            if (updateGuid)
+            {
+                // Copy targetComponent as a new reference.
+                var guid = GUID.Generate().ToString();
+                dst.targetComponent.exposedName = guid;
+                var resolver = serializedObject.context as IExposedPropertyTable;
+                resolver?.SetReferenceValue(guid, src.targetComponent.Resolve(resolver));
+            }
+            else
+                // Simply copy targetComponent.
+                dst.targetComponent = src.targetComponent;
         }
 
         #endregion
@@ -114,6 +120,8 @@ namespace Klak.Timeline
             public static readonly GUIContent Copy = new GUIContent("Copy");
             public static readonly GUIContent Paste = new GUIContent("Paste");
         }
+
+        static MidiControl _clipboard = new MidiControl();
 
         void OnContextClick(Vector2 pos, int index)
         {
@@ -150,13 +158,16 @@ namespace Klak.Timeline
             serializedObject.Update();
             _controls.MoveArrayElement(src, dst);
             serializedObject.ApplyModifiedProperties();
+            // We don't need to refresh the timeline in this case.
+            // TimelineEditor.Refresh(RefreshReason.ContentsModified);
         }
 
         void OnResetControl(int index)
         {
-            serializedObject.Update();
-            ResetControl(_controls.GetArrayElementAtIndex(index));
-            serializedObject.ApplyModifiedProperties();
+            var track = (MidiAnimationTrack)target;
+            Undo.RecordObject(track, "Reset MIDI Control");
+            track.template.controls[index] = new MidiControl();
+            TimelineEditor.Refresh(RefreshReason.ContentsModified);
         }
 
         void OnRemoveControl(int index)
@@ -164,16 +175,22 @@ namespace Klak.Timeline
             serializedObject.Update();
             _controls.DeleteArrayElementAtIndex(index);
             serializedObject.ApplyModifiedProperties();
+            TimelineEditor.Refresh(RefreshReason.ContentsModified);
         }
 
         void OnCopyControl(int index)
         {
-            Debug.Log("Not implemented");
+            var track = (MidiAnimationTrack)target;
+            Undo.RecordObject(track, "Copy MIDI Control");
+            CopyControl(track.template.controls[index], _clipboard, false);
         }
 
         void OnPasteControl(int index)
         {
-            Debug.Log("Not implemented");
+            var track = (MidiAnimationTrack)target;
+            Undo.RecordObject(track, "Paste MIDI Control");
+            CopyControl(_clipboard, track.template.controls[index], true);
+            TimelineEditor.Refresh(RefreshReason.ContentsModified);
         }
 
         #endregion

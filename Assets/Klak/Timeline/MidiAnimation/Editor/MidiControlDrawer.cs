@@ -8,13 +8,12 @@ using UnityEngine.Timeline;
 
 namespace Klak.Timeline
 {
-    #region Property drawer for MidiControl
-
-    class MidiControlDrawer
+    // Property drawer implementation for MidiControl
+    sealed class MidiControlInternalDrawer
     {
         #region Public properties and methods
 
-        public MidiControlDrawer(SerializedProperty property)
+        public MidiControlInternalDrawer(SerializedProperty property)
         {
             _mode       = property.FindPropertyRelative("mode");
             _noteFilter = property.FindPropertyRelative("noteFilter");
@@ -333,18 +332,17 @@ namespace Klak.Timeline
         #endregion
     }
 
-    #endregion
-
-    #region Custom property drawer class (works as entry points)
-
+    // Custom property drawer for MidiControl
+    // Provides a cache for instances of the drawer implementation.
     [CustomPropertyDrawer(typeof(MidiControl), true)]
-    sealed class MidiControlDrawerEntry : PropertyDrawer
+    sealed class MidiControlDrawer : PropertyDrawer
     {
-        Dictionary<string, MidiControlDrawer> _drawers = new Dictionary<string, MidiControlDrawer>();
+        Dictionary<string, MidiControlInternalDrawer>
+            _drawers = new Dictionary<string, MidiControlInternalDrawer>();
 
-        MidiControlDrawer GetCachedDrawer(SerializedProperty property)
+        MidiControlInternalDrawer GetCachedDrawer(SerializedProperty property)
         {
-            MidiControlDrawer drawer;
+            MidiControlInternalDrawer drawer;
 
             var path = property.propertyPath;
             _drawers.TryGetValue(path, out drawer);
@@ -353,7 +351,7 @@ namespace Klak.Timeline
             {
                 // No instance was found witht the given path,
                 // so create a new instance for it.
-                drawer = new MidiControlDrawer(property);
+                drawer = new MidiControlInternalDrawer(property);
                 _drawers[path] = drawer;
             }
 
@@ -380,6 +378,4 @@ namespace Klak.Timeline
             return GetCachedDrawer(property).GetTotalHeight();
         }
     }
-
-    #endregion
 }

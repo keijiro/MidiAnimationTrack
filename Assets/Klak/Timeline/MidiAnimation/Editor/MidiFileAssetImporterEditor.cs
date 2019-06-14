@@ -3,8 +3,9 @@ using UnityEditor.Experimental.AssetImporters;
 
 namespace Klak.Timeline
 {
+    // Custom inspector for MIDI file assets
     [CustomEditor(typeof(MidiFileAssetImporter)), CanEditMultipleObjects]
-    class MidiFileAssetImporterEditor : ScriptedImporterEditor
+    sealed class MidiFileAssetImporterEditor : ScriptedImporterEditor
     {
         SerializedProperty _tempo;
 

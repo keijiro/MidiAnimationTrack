@@ -3,6 +3,7 @@ using UnityEditor;
 
 namespace Klak.Timeline
 {
+    // Custom inspector for MidiSignalReceiver
     [CustomEditor(typeof(MidiSignalReceiver))]
     sealed class MidiSignalReceiverEditor : Editor
     {

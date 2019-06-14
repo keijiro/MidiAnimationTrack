@@ -3,8 +3,9 @@ using UnityEngine;
 
 namespace Klak.Timeline
 {
+    // Custom property drawer for MidiNoteFilter struct
     [CustomPropertyDrawer(typeof(MidiNoteFilter), true)]
-    class MidiNoteFilterDrawer : PropertyDrawer
+    sealed class MidiNoteFilterDrawer : PropertyDrawer
     {
         static readonly int [] _noteValues = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12 };
 

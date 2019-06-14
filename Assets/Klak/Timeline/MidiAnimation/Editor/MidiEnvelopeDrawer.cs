@@ -3,8 +3,9 @@ using UnityEngine;
 
 namespace Klak.Timeline
 {
+    // Custom property drawer for ADSR envelope parameters
     [CustomPropertyDrawer(typeof(MidiEnvelope), true)]
-    class MidiEnvelopeDrawer : PropertyDrawer
+    sealed class MidiEnvelopeDrawer : PropertyDrawer
     {
         #region Public method
 

@@ -4,6 +4,8 @@ using UnityEditor.Timeline;
 
 namespace Klak.Timeline
 {
+    // Custom inspector for MIDI animation tracks
+    // It provides a UI for editing track controls.
     [CustomEditor(typeof(MidiAnimationTrack))]
     class MidiAnimationTrackEditor : Editor
     {

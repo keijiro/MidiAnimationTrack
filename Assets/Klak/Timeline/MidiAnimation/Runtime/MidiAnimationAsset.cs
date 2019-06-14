@@ -4,6 +4,7 @@ using UnityEngine.Timeline;
 
 namespace Klak.Timeline
 {
+    // Playable asset class that contains a MIDI animation clip
     [System.Serializable]
     public sealed class MidiAnimationAsset : PlayableAsset, ITimelineClipAsset
     {

@@ -3,6 +3,8 @@ using UnityEngine.Playables;
 
 namespace Klak.Timeline
 {
+    // Runtime playable class that manages a MIDI animation track (clips and
+    // its assigned controls)
     [System.Serializable]
     public sealed class MidiAnimationMixer : PlayableBehaviour
     {

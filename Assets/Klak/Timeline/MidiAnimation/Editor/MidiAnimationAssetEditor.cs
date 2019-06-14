@@ -5,6 +5,8 @@ using System.Linq;
 
 namespace Klak.Timeline
 {
+    // Custom inspector for MIDI assets
+    // There is no editable property; It just shows some infomation.
     [CustomEditor(typeof(MidiAnimationAsset))]
     class MidiAnimationAssetEditor : Editor
     {

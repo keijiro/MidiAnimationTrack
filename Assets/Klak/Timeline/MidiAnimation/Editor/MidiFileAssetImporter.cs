@@ -4,8 +4,9 @@ using UnityEditor.Experimental.AssetImporters;
 
 namespace Klak.Timeline
 {
+    // Custom importer for .mid files
     [ScriptedImporter(1, "mid")]
-    public class MidiFileAssetImporter : ScriptedImporter
+    sealed class MidiFileAssetImporter : ScriptedImporter
     {
         [SerializeField] float _tempo = 120;
 

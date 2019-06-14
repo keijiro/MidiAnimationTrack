@@ -2,6 +2,8 @@ using UnityEngine;
 
 namespace Klak.Timeline
 {
+    // MIDI control class and related structs and enums
+
     #region Control parameter types
 
     public enum MidiNote {

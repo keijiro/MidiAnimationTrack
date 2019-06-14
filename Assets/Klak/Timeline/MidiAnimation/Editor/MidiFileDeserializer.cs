@@ -4,6 +4,7 @@ using UnityEngine;
 
 namespace Klak.Timeline
 {
+    // SMF file deserializer implementation
     static class MidiFileDeserializer
     {
         #region Public members

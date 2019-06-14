@@ -3,6 +3,7 @@ using UnityEngine.Playables;
 
 namespace Klak.Timeline
 {
+    // Runtime playable class that calculates MIDI based animation
     [System.Serializable]
     public sealed class MidiAnimation : PlayableBehaviour
     {

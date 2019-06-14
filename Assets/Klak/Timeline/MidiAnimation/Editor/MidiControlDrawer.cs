@@ -6,7 +6,7 @@ using UnityEngine;
 using UnityEngine.Playables;
 using UnityEngine.Timeline;
 
-namespace Klak.Timeline
+namespace Klak.Timeline.Midi
 {
     // Property drawer implementation for MidiControl
     sealed class MidiControlInternalDrawer

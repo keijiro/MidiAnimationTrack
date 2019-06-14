@@ -1,7 +1,7 @@
 using UnityEditor;
 using UnityEditor.Experimental.AssetImporters;
 
-namespace Klak.Timeline
+namespace Klak.Timeline.Midi
 {
     // Custom inspector for MIDI file assets
     [CustomEditor(typeof(MidiFileAssetImporter)), CanEditMultipleObjects]

@@ -2,7 +2,7 @@ using UnityEngine;
 using UnityEngine.Playables;
 using UnityEngine.Timeline;
 
-namespace Klak.Timeline
+namespace Klak.Timeline.Midi
 {
     // Track asset class that contains a MIDI animation track (clips and its
     // assigned controls)

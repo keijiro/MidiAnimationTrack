@@ -1,4 +1,4 @@
-namespace Klak.Timeline
+namespace Klak.Timeline.Midi
 {
     // MIDI event raw data struct
     [System.Serializable]

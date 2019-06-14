@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace Klak.Timeline
+namespace Klak.Timeline.Midi
 {
     // SMF file deserializer implementation
     static class MidiFileDeserializer

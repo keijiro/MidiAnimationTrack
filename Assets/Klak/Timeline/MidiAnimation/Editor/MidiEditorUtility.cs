@@ -1,6 +1,6 @@
 using UnityEditor;
 
-namespace Klak.Timeline
+namespace Klak.Timeline.Midi
 {
     static class MidiEditorUtility
     {

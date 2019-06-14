@@ -2,7 +2,7 @@ using UnityEngine;
 using UnityEditor;
 using UnityEditor.Timeline;
 
-namespace Klak.Timeline
+namespace Klak.Timeline.Midi
 {
     // Custom inspector for MIDI animation tracks
     // It provides a UI for editing track controls.

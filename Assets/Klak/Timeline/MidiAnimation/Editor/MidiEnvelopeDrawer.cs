@@ -1,7 +1,7 @@
 using UnityEditor;
 using UnityEngine;
 
-namespace Klak.Timeline
+namespace Klak.Timeline.Midi
 {
     // Custom property drawer for ADSR envelope parameters
     [CustomPropertyDrawer(typeof(MidiEnvelope), true)]

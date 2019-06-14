@@ -1,7 +1,7 @@
 using UnityEngine;
 using UnityEngine.Playables;
 
-namespace Klak.Timeline
+namespace Klak.Timeline.Midi
 {
     // Runtime playable class that manages a MIDI animation track (clips and
     // its assigned controls)

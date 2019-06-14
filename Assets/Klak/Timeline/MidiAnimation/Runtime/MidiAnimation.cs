@@ -1,7 +1,7 @@
 using UnityEngine;
 using UnityEngine.Playables;
 
-namespace Klak.Timeline
+namespace Klak.Timeline.Midi
 {
     // Runtime playable class that calculates MIDI based animation
     [System.Serializable]

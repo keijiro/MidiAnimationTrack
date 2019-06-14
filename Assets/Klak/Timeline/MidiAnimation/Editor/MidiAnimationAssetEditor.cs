@@ -3,7 +3,7 @@ using UnityEngine;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Klak.Timeline
+namespace Klak.Timeline.Midi
 {
     // Custom inspector for MIDI assets
     // There is no editable property; It just shows some infomation.

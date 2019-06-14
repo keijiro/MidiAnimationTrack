@@ -2,7 +2,7 @@ using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.Playables;
 
-namespace Klak.Timeline
+namespace Klak.Timeline.Midi
 {
     // Receives MIDI signals (MIDI event notifications) from a timeline and
     // invokes assigned events.

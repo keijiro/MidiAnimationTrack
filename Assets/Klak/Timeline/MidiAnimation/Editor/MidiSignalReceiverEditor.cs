@@ -1,7 +1,7 @@
 using UnityEngine;
 using UnityEditor;
 
-namespace Klak.Timeline
+namespace Klak.Timeline.Midi
 {
     // Custom inspector for MidiSignalReceiver
     [CustomEditor(typeof(MidiSignalReceiver))]

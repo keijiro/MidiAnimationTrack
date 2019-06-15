@@ -105,8 +105,13 @@ namespace Klak.Timeline.Midi
             // Resolve wrapping-around cases by offsetting.
             if (t1 < t0) t1 += (t0 / duration + 1) * duration;
 
+            // Offset both the points to make t0 < duration.
+            var offs = (t0 / duration) * duration;
+            t0 -= offs;
+            t1 -= offs;
+
             // Resolve loops.
-            for (t0 %= duration; t1 >= duration; t1 -= duration)
+            for (; t1 >= duration; t1 -= duration)
             {
                 // Trigger signals between t0 and the end of the clip.
                 TriggerSignalsTick(playable, output, t0, 0xffffffffu);

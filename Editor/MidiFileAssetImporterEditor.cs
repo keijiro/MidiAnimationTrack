@@ -13,6 +13,7 @@ namespace Klak.Timeline.Midi
 
         public override void OnEnable()
         {
+            base.OnEnable();
             _tempo = serializedObject.FindProperty("_tempo");
         }
 

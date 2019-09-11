@@ -3,8 +3,11 @@
     "dependencies": { },
     "description": "Custom playables that provides MIDI based animation.",
     "displayName": "MIDI Animation Track",
+    "keywords": [ "unity" ],
+    "license": "Unlicense",
     "name": "jp.keijiro.klak.timeline.midi",
+    "repository": "github:keijiro/MidiAnimationTrack",
     "unity": "2019.1",
     "unityRelease": "0f1",
-    "version": "1.0.1"
+    "version": "1.0.2"
 }

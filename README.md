@@ -19,20 +19,47 @@ System requirements
 Installation
 ------------
 
-Download and import one of the `.unitypackage` files from the [Releases] page.
+<!--4567890123456789012345678901234567890123456789012345678901234567890123456-->
+This package is distributed via the [npmjs] registry. You can import it using
+the [scoped registry] feature of Unity Package Manager.
 
-You can also use [Git support on Package Manager] to import the package. Add
-the following line to the `dependencies` section in the package manifest file
-(`Packages/manifest.json`). See [the forum thread][Git support on Package
-Manager] for further details.
+To import the package, please add the following sections to the package
+manifest file (`Packages/manifest.json`).
+
+To the `scopedRegistries` section:
 
 ```
-"jp.keijiro.klak.timeline.midi": "https://github.com/keijiro/MidiAnimationTrack.git#upm"
+{
+  "name": "Keijiro",
+  "url": "https://registry.npmjs.com",
+  "scopes": [ "jp.keijiro" ]
+}
 ```
 
-[Releases]: https://github.com/keijiro/MidiAnimationTrack/releases
-[Git support on Package Manager]:
-  https://forum.unity.com/threads/git-support-on-package-manager.573673/
+To the `dependencies` section:
+
+```
+"jp.keijiro.klak.timeline.midi": "1.0.3"
+```
+
+After changes, the manifest file should look like below:
+
+```
+{
+  "scopedRegistries": [
+    {
+      "name": "Keijiro",
+      "url": "https://registry.npmjs.com",
+      "scopes": [ "jp.keijiro" ]
+    }
+  ],
+  "dependencies": {
+    "jp.keijiro.klak.timeline.midi": "1.0.3",
+    ...
+```
+
+[npmjs]: https://www.npmjs.com/
+[scoped registry]: https://docs.unity3d.com/Manual/upm-scoped.html
 
 Importing .mid files
 --------------------

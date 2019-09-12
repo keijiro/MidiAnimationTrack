@@ -1,0 +1,13 @@
+{
+    "author": "Keijiro Takahashi",
+    "dependencies": { },
+    "description": "MIDI Animation Track is a custom timeline/playables package that provides functionality to control object properties based on sequence data contained in a standard MIDI file",
+    "displayName": "MIDI Animation Track",
+    "keywords": [ "unity" ],
+    "license": "Unlicense",
+    "name": "jp.keijiro.klak.timeline.midi",
+    "repository": "github:keijiro/MidiAnimationTrack",
+    "unity": "2019.1",
+    "unityRelease": "0f1",
+    "version": "1.0.3"
+}

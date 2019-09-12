@@ -19,7 +19,9 @@ namespace Klak.Timeline.Midi
 
         public override void OnInspectorGUI()
         {
+            serializedObject.Update();
             EditorGUILayout.PropertyField(_tempo);
+            serializedObject.ApplyModifiedProperties();
             ApplyRevertGUI();
         }
     }

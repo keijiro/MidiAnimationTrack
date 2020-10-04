@@ -99,6 +99,30 @@ At the moment, a track control only supports `float`, `Vector3`, `Quaternion`
 and `Color` properties. Please note that it requires a public *property* to
 be animated; Just providing a public *variable* is not enough.
 
+Here an example to declare a *property* in your scripts :
+
+```
+public class TestProp : MonoBehaviour
+{
+    [SerializeField] 
+    private float m_experience;
+
+    public float experience
+    {
+        get
+        {
+            //Some other code
+            return m_experience;
+        }
+        set
+        {
+            //Some other code
+            m_experience = value;
+        }
+    }
+}
+```
+
 There are three modes in the track control: **Note Envelope**, **Note Curve**
 and **CC**.
 

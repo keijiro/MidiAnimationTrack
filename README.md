@@ -19,7 +19,6 @@ System requirements
 Installation
 ------------
 
-<!--4567890123456789012345678901234567890123456789012345678901234567890123456-->
 This package is distributed via the [npmjs] registry. You can import it using
 the [scoped registry] feature of Unity Package Manager.
 
@@ -39,7 +38,7 @@ To the `scopedRegistries` section:
 To the `dependencies` section:
 
 ```
-"jp.keijiro.klak.timeline.midi": "1.0.3"
+"jp.keijiro.klak.timeline.midi": "1.0.4"
 ```
 
 After changes, the manifest file should look like below:
@@ -54,7 +53,7 @@ After changes, the manifest file should look like below:
     }
   ],
   "dependencies": {
-    "jp.keijiro.klak.timeline.midi": "1.0.3",
+    "jp.keijiro.klak.timeline.midi": "1.0.4",
     ...
 ```
 

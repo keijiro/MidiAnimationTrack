@@ -1,0 +1,6 @@
+<linker>
+<assembly fullname="UnityEngine">
+<type fullname="UnityEngine.SpotLight" preserve="all"/>
+<type fullname="UnityEngine.Transform" preserve="all"/>
+</assembly>
+</linker>

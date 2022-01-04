@@ -38,7 +38,7 @@ To the `scopedRegistries` section:
 To the `dependencies` section:
 
 ```
-"jp.keijiro.klak.timeline.midi": "1.0.4"
+"jp.keijiro.klak.timeline.midi": "1.0.5"
 ```
 
 After changes, the manifest file should look like below:
@@ -53,7 +53,7 @@ After changes, the manifest file should look like below:
     }
   ],
   "dependencies": {
-    "jp.keijiro.klak.timeline.midi": "1.0.4",
+    "jp.keijiro.klak.timeline.midi": "1.0.5",
     ...
 ```
 

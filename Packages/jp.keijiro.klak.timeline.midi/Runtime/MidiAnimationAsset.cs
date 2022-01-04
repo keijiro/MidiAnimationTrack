@@ -26,6 +26,7 @@ namespace Klak.Timeline.Midi
 
         public ClipCaps clipCaps { get {
             return ClipCaps.Blending |
+                   ClipCaps.ClipIn |
                    ClipCaps.Extrapolation |
                    ClipCaps.Looping |
                    ClipCaps.SpeedMultiplier;
